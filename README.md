@@ -5,7 +5,9 @@
 ![Project Image/Badge Example](https://img.shields.io) <!-- Add relevant badges, e.g., using Shields.io. -->
 
 ## Description
-
+Potential names:
+* Comforting Food Hub
+* Open Recipe Box
 <!-- Go into more depth about what your project does, the problem it solves, and why a user should care. You can add a list of key features here as well. -->
 
 ## Getting Started
