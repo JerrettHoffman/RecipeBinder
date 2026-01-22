@@ -1,6 +1,7 @@
 # Project Title
 
 <!-- Provide a concise, one-paragraph description of your project's purpose and function. -->
+A tool for managing your recipes.
 
 ![Project Image/Badge Example](https://img.shields.io) <!-- Add relevant badges, e.g., using Shields.io. -->
 
