@@ -29,3 +29,6 @@ go.work.sum
 
 # Vim sessions
 *.vim
+
+# Neovim Project Configs
+.editorconfig
