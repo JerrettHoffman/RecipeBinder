@@ -1,0 +1,44 @@
+{{define "ingredientsList"}}
+<ul>
+{{range .Ingredients}}
+<li>{{.}}</li>
+{{end}}
+</ul>
+{{end}}
+
+{{define "content"}}
+	<h1>Recipe Name</h1>
+	<div>
+	<p>By: {{.Author}}</p>
+	<p>Uploaded by: {{.Uploader}}</p>
+	</div>
+	<div>
+	<p>Prep time: <time>{{.PrepTime}}</time></p>
+	<p>Total time: <time>{{.TotalTime}}</time></p>
+	<p>Yield: {{.Yield}}</p>
+	</div>
+	<img>
+	<h2>Ingredients:</h2>
+	{{template "ingredientsList" .}}
+	<h2>Steps:</h2>
+	<p>{{.Steps}}</p>
+	</main>
+	<button id="open-ingredient-popup">Show Ingredients</button>
+	<dialog id="ingredient-popup" closedby="any">
+	<button id="close-ingredient-popup" autofocus>Close Ingredients</button>
+	{{template "ingredientsList" .}}
+	</dialog>
+	<script>
+	const dialog = document.getElementById("ingredient-popup");
+	const openButton = document.getElementById("open-ingredient-popup");
+	const closeButton = document.getElementById("close-ingredient-popup");
+
+	openButton.addEventListener("click", () => {
+		dialog.showModal();
+	});
+
+	closeButton.addEventListener("click", () => {
+		dialog.close();
+	});
+	</script>
+{{end}}
