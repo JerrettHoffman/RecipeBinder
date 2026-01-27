@@ -8,8 +8,8 @@ type RecipeData struct {
 	Uploader    string
 	PrepTime    time.Duration
 	TotalTime   time.Duration
-	Yield       int
-	Ingredients []string
+	Yield       string
+	Ingredients string
 	Image       string
 	Steps       string
 }
@@ -38,8 +38,8 @@ func (t TestRecipeBuilder) BuildRecipe() RecipeData {
 		Uploader:    "Ms. Ipsum",
 		PrepTime:    prepTime,
 		TotalTime:   totalTime,
-		Yield:       4,
-		Ingredients: []string{"lorem", "ipsum", "turkey neck"},
+		Yield:       "4 Dolor",
+		Ingredients: "4 Cups lorem, A pinch of ipsum",
 		Image:       "lorem ipsum image",
 		Steps:       "1. Lorem \n 2.Ipsum \n 3.I hope the new lines work?",
 	}

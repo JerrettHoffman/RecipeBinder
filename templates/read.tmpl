@@ -19,7 +19,7 @@
 	</div>
 	<img>
 	<h2>Ingredients:</h2>
-	{{template "ingredientsList" .}}
+	{{.Ingredients}}
 	<h2>Steps:</h2>
 	{{range .Steps}}
 	<p>{{.}}</p>
@@ -28,7 +28,7 @@
 	<button id="open-ingredient-popup">Show Ingredients</button>
 	<dialog id="ingredient-popup" closedby="any">
 	<button id="close-ingredient-popup" autofocus>Close Ingredients</button>
-	{{template "ingredientsList" .}}
+	{{.Ingredients}}
 	</dialog>
 	<script>
 	const dialog = document.getElementById("ingredient-popup");
