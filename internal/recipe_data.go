@@ -2,31 +2,26 @@ package internal
 
 import "time"
 
-type recipeData struct {
+type RecipeData struct {
 	RecipeName  string
 	Author      string
 	Uploader    string
 	PrepTime    time.Duration
 	TotalTime   time.Duration
-	Yield       int
-	Ingredients []ingredient
+	Yield       string
+	Ingredients string
 	Image       string
 	Steps       string
 }
 
-type ingredient struct {
-	IngredientName string
-	Amount         string
-}
-
 type RecipdeDataBuilder interface {
-	BuildRecipe() recipeData
+	BuildRecipe() RecipeData
 }
 
 type TestRecipeBuilder struct {
 }
 
-func (t TestRecipeBuilder) BuildRecipe() recipeData {
+func (t TestRecipeBuilder) BuildRecipe() RecipeData {
 	prepTime, err := time.ParseDuration("1h30m")
 	if err != nil {
 		prepTime = 0
@@ -37,27 +32,15 @@ func (t TestRecipeBuilder) BuildRecipe() recipeData {
 		totalTime = 0
 	}
 
-	return recipeData{
+	return RecipeData{
 		RecipeName:  "Lorem Ipsum",
 		Author:      "Mr. Lorem",
 		Uploader:    "Ms. Ipsum",
 		PrepTime:    prepTime,
 		TotalTime:   totalTime,
-		Yield:       4,
-		Ingredients: BuildTestIngredients(),
+		Yield:       "4 Dolor",
+		Ingredients: "4 Cups lorem, A pinch of ipsum",
 		Image:       "lorem ipsum image",
 		Steps:       "1. Lorem \n 2.Ipsum \n 3.I hope the new lines work?",
 	}
-}
-
-func BuildTestIngredients() []ingredient {
-	ingredient1 := ingredient{
-		IngredientName: "Lorem",
-		Amount:         "2.5 Lor",
-	}
-	ingredient2 := ingredient{
-		IngredientName: "Ipsum",
-		Amount:         "1/2 Pinch of Ip",
-	}
-	return []ingredient{ingredient1, ingredient2}
 }
