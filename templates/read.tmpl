@@ -21,7 +21,9 @@
 	<h2>Ingredients:</h2>
 	{{template "ingredientsList" .}}
 	<h2>Steps:</h2>
-	<p>{{.Steps}}</p>
+	{{range .Steps}}
+	<p>{{.}}</p>
+	{{end}}
 	</main>
 	<button id="open-ingredient-popup">Show Ingredients</button>
 	<dialog id="ingredient-popup" closedby="any">

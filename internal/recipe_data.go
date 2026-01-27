@@ -2,7 +2,7 @@ package internal
 
 import "time"
 
-type recipeData struct {
+type RecipeData struct {
 	RecipeName  string
 	Author      string
 	Uploader    string
@@ -15,13 +15,13 @@ type recipeData struct {
 }
 
 type RecipdeDataBuilder interface {
-	BuildRecipe() recipeData
+	BuildRecipe() RecipeData
 }
 
 type TestRecipeBuilder struct {
 }
 
-func (t TestRecipeBuilder) BuildRecipe() recipeData {
+func (t TestRecipeBuilder) BuildRecipe() RecipeData {
 	prepTime, err := time.ParseDuration("1h30m")
 	if err != nil {
 		prepTime = 0
@@ -32,7 +32,7 @@ func (t TestRecipeBuilder) BuildRecipe() recipeData {
 		totalTime = 0
 	}
 
-	return recipeData{
+	return RecipeData{
 		RecipeName:  "Lorem Ipsum",
 		Author:      "Mr. Lorem",
 		Uploader:    "Ms. Ipsum",
