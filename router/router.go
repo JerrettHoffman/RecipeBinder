@@ -107,9 +107,9 @@ func (router *Router) readRecipeHandler(w http.ResponseWriter, r *http.Request) 
 		PrepTime            string
 		TotalTime           string
 		Yield               string
-		ingredientsSections []ingredientSection
+		IngredientSections []ingredientSection
 		Image               string
-		Steps               []stepSection
+		StepSections       []stepSection
 	}
 
 	// Todo: use id for actual lookup of data
