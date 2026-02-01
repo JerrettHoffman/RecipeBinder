@@ -6,14 +6,20 @@ import (
 	"log"
 	"net/http"
 	"regexp"
-	"strconv"
 	"text/template"
 	"time"
 )
 
 const (
 	maxIngredientCapacity = 100
+	headerMarkup = "##"
+	bulletMarkup = "* "
 )
+
+type ingredientSection struct {
+	Header      string
+	Ingredients []string
+}
 
 type Router struct {
 	Mux *http.ServeMux
@@ -32,41 +38,53 @@ func (router *Router) Setup() {
 
 var readTpl = template.Must(template.ParseFiles("templates/base.tmpl", "templates/header.tmpl", "templates/read.tmpl"))
 
+// Take in string of ingredient text and separate it into sections with headers
+// and individual ingredients
+func formatIngredientSections(ingredientText string) []ingredientSection {
+	return nil
+}
+
 func (router *Router) readRecipeHandler(w http.ResponseWriter, r *http.Request) {
 	type data struct {
-		RecipeName  string
-		Author      string
-		Uploader    string
-		PrepTime    string
-		TotalTime   string
-		Yield       int
-		Ingredients []string
-		Image       string
-		Steps       []string
+		RecipeName          string
+		Author              string
+		Uploader            string
+		PrepTime            string
+		TotalTime           string
+		Yield               string
+		ingredientsSections []ingredientSection
+		Image               string
+		Steps               []string
 	}
 
 	// Todo: use id for actual lookup of data
 	builder := internal.TestRecipeBuilder{}
 	recipeData := builder.BuildRecipe()
 
+	// Format the times
 	prepTimeHours := int(recipeData.PrepTime.Hours())
 	prepTimeMinutes := int(recipeData.PrepTime.Minutes()) % 60
+	prepTimeFormatted := fmt.Sprintf("%dh %dm", prepTimeHours, prepTimeMinutes)
+
 	totalTimeHours := int(recipeData.TotalTime.Hours())
 	totalTimeMinutes := int(recipeData.TotalTime.Minutes()) % 60
+	totalTimeFormatted := fmt.Sprintf("%dh %dm", totalTimeHours, totalTimeMinutes)
+
+	ingredientSections := formatIngredientSections(recipeData.Ingredients)
+
+	steps := regexp.MustCompile("\r?\n").Split(recipeData.Steps, -1)
 
 	pageData := data{
 		recipeData.RecipeName,
 		recipeData.Author,
 		recipeData.Uploader,
-		fmt.Sprintf("%dh %dm", prepTimeHours, prepTimeMinutes),
-		fmt.Sprintf("%dh %dm", totalTimeHours, totalTimeMinutes),
+		prepTimeFormatted,
+		totalTimeFormatted,
 		recipeData.Yield,
-		recipeData.Ingredients,
+		ingredientSections,
 		recipeData.Image,
-		nil,
+		steps,
 	}
-
-	pageData.Steps = regexp.MustCompile("\r?\n").Split(recipeData.Steps, -1)
 
 	if err := readTpl.Execute(w, pageData); err != nil {
 		log.Printf("Failed to execute read %v\n", err)
@@ -100,9 +118,9 @@ func (router *Router) editPostRecipeHandler(w http.ResponseWriter, r *http.Reque
 	uploader := r.PostFormValue("uploader")
 	prepTimeStr := r.PostFormValue("prep-time")
 	totalTimeStr := r.PostFormValue("total-time")
-	yieldStr := r.PostFormValue("yield")
+	yield := r.PostFormValue("yield")
 	finalImage := r.PostFormValue("final-image")
-	ingredientCountStr := r.PostFormValue("ingredient-count")
+	ingredientsStr := r.PostFormValue("ingredient")
 	steps := r.PostFormValue("steps")
 
 	// Parse any non-string fields
@@ -116,11 +134,6 @@ func (router *Router) editPostRecipeHandler(w http.ResponseWriter, r *http.Reque
 		log.Printf("Failed to parse totalTime \"%s\" in editPost: %s", totalTimeStr, err)
 	}
 
-	yield := 0
-	if yield, err = strconv.Atoi(yieldStr); err != nil {
-		log.Printf("Failed to parse yield \"%s\" in editPost: %s", yieldStr, err)
-	}
-
 	dbData := internal.RecipeData{
 		RecipeName:  recipeName,
 		Author:      author,
@@ -128,24 +141,13 @@ func (router *Router) editPostRecipeHandler(w http.ResponseWriter, r *http.Reque
 		PrepTime:    prepTime,
 		TotalTime:   totalTime,
 		Yield:       yield,
-		Ingredients: nil,
+		Ingredients: ingredientsStr,
 		Image:       finalImage,
 		Steps:       steps,
 	}
 
-	// Parse the ingredients one by one
-	if ingredientCount, err := strconv.Atoi(ingredientCountStr); err != nil {
-		log.Printf("Failed to parse ingredient count \"%s\" in editPost: %v", ingredientCountStr, err)
-	} else {
-		// Reserve capacity for the number of expected ingredients
-		dbData.Ingredients = make([]string, 0, min(ingredientCount, maxIngredientCapacity))
-		for i := range ingredientCount {
-			val := r.PostFormValue(fmt.Sprintf("ingredient-%d", i))
-			dbData.Ingredients = append(dbData.Ingredients, val)
-		}
-	}
-
 	// Send to DB
+	log.Printf("%v", dbData);
 
 	// Reroute to the new read page for the created index
 }
