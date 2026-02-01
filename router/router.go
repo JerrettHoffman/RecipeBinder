@@ -6,19 +6,30 @@ import (
 	"log"
 	"net/http"
 	"regexp"
+	"strings"
 	"text/template"
 	"time"
 )
 
 const (
 	maxIngredientCapacity = 100
-	headerMarkup = "##"
-	bulletMarkup = "* "
+	headerMarkup          = "##"
+	bulletMarkup          = "* "
+)
+
+var (
+	readTpl *template.Template
+	editTpl *template.Template
 )
 
 type ingredientSection struct {
 	Header      string
 	Ingredients []string
+}
+
+type stepSection struct {
+	Header string
+	Steps  []string
 }
 
 type Router struct {
@@ -34,14 +45,58 @@ func (router *Router) Setup() {
 	router.Mux.HandleFunc("/read/{id}", router.readRecipeHandler)
 	router.Mux.HandleFunc("GET /edit/{id}", router.editGetRecipeHandler)
 	router.Mux.HandleFunc("POST /edit/{id}", router.editPostRecipeHandler)
+	readTpl = template.Must(template.ParseFiles("templates/base.tmpl", "templates/header.tmpl", "templates/read.tmpl"))
+	editTpl = template.Must(template.ParseFiles("templates/base.tmpl", "templates/header.tmpl", "templates/edit.tmpl"))
 }
-
-var readTpl = template.Must(template.ParseFiles("templates/base.tmpl", "templates/header.tmpl", "templates/read.tmpl"))
 
 // Take in string of ingredient text and separate it into sections with headers
 // and individual ingredients
 func formatIngredientSections(ingredientText string) []ingredientSection {
-	return nil
+	outIngredientSections := make([]ingredientSection, 1, 2)
+
+	sectionIndex := 0
+	currentSection := &outIngredientSections[sectionIndex]
+	currentSection.Ingredients = make([]string, 0, 3)
+
+	lines := regexp.MustCompile("\r?\n").Split(ingredientText, -1)
+	for _, line := range lines {
+		if strings.HasPrefix(line, headerMarkup) {
+			outIngredientSections = append(outIngredientSections, ingredientSection{
+				Header:      strings.TrimPrefix(line, headerMarkup),
+				Ingredients: make([]string, 0, 3),
+			})
+			sectionIndex++
+			currentSection = &outIngredientSections[sectionIndex]
+		} else if strings.HasPrefix(line, bulletMarkup) {
+			currentSection.Ingredients = append(currentSection.Ingredients, strings.TrimPrefix(line, bulletMarkup))
+		}
+	}
+
+	return outIngredientSections
+}
+
+func formatStepSections(stepText string) []stepSection {
+	outStepSections := make([]stepSection, 1)
+
+	sectionIndex := 0
+	currentSection := &outStepSections[sectionIndex]
+	currentSection.Steps = make([]string, 0, 3)
+
+	lines := regexp.MustCompile("\r?\n").Split(stepText, -1)
+	for _, line := range lines {
+		if strings.HasPrefix(line, headerMarkup) {
+			outStepSections = append(outStepSections, stepSection{
+				Header: strings.TrimPrefix(line, headerMarkup),
+				Steps:  make([]string, 0, 3),
+			})
+			sectionIndex++
+			currentSection = &outStepSections[sectionIndex]
+		} else if len(line) > 0 {
+			currentSection.Steps = append(currentSection.Steps, line)
+		}
+	}
+
+	return outStepSections
 }
 
 func (router *Router) readRecipeHandler(w http.ResponseWriter, r *http.Request) {
@@ -54,7 +109,7 @@ func (router *Router) readRecipeHandler(w http.ResponseWriter, r *http.Request) 
 		Yield               string
 		ingredientsSections []ingredientSection
 		Image               string
-		Steps               []string
+		Steps               []stepSection
 	}
 
 	// Todo: use id for actual lookup of data
@@ -72,7 +127,7 @@ func (router *Router) readRecipeHandler(w http.ResponseWriter, r *http.Request) 
 
 	ingredientSections := formatIngredientSections(recipeData.Ingredients)
 
-	steps := regexp.MustCompile("\r?\n").Split(recipeData.Steps, -1)
+	stepsSections := formatStepSections(recipeData.Steps)
 
 	pageData := data{
 		recipeData.RecipeName,
@@ -83,7 +138,7 @@ func (router *Router) readRecipeHandler(w http.ResponseWriter, r *http.Request) 
 		recipeData.Yield,
 		ingredientSections,
 		recipeData.Image,
-		steps,
+		stepsSections,
 	}
 
 	if err := readTpl.Execute(w, pageData); err != nil {
@@ -91,8 +146,6 @@ func (router *Router) readRecipeHandler(w http.ResponseWriter, r *http.Request) 
 		http.Error(w, "server error", http.StatusInternalServerError)
 	}
 }
-
-var editTpl = template.Must(template.ParseFiles("templates/base.tmpl", "templates/header.tmpl", "templates/edit.tmpl"))
 
 func (router *Router) editGetRecipeHandler(w http.ResponseWriter, r *http.Request) {
 	// Todo: use id for actual lookup of data
@@ -147,7 +200,7 @@ func (router *Router) editPostRecipeHandler(w http.ResponseWriter, r *http.Reque
 	}
 
 	// Send to DB
-	log.Printf("%v", dbData);
+	log.Printf("%v", dbData)
 
 	// Reroute to the new read page for the created index
 }
