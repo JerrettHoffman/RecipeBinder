@@ -1,9 +1,77 @@
+/* See RosePineLicense */
+:root {
+	/* Rosé Pine Dawn */
+	--rp-base: rgb(250, 244, 237);
+	--rp-surface: rgb(255, 250, 243);
+	--rp-overlay: rgb(242, 233, 222);
+	--rp-muted: rgb(152, 147, 165);
+	--rp-subtle: rgb(121, 117, 147);
+	--rp-text: rgb(87, 82, 121);
+	--rp-love: rgb(180, 99, 122);
+	--rp-gold: rgb(234, 157, 52);
+	--rp-rose: rgb(215, 130, 126);
+	--rp-pine: rgb(40, 105, 131);
+	--rp-foam: rgb(86, 148, 159);
+	--rp-iris: rgb(144, 122, 169);
+	--rp-highlight-low: rgb(244, 237, 232);
+	--rp-highlight-med: rgb(223, 218, 217);
+	--rp-highlight-high: rgb(206, 202, 205);
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		/* Rosé Pine */
+		/* --rp-base: rgb(25, 23, 36); */
+		/* --rp-surface: rgb(31, 29, 46); */
+		/* --rp-overlay: rgb(38, 35, 58); */
+		/* --rp-muted: rgb(110, 106, 134); */
+		/* --rp-subtle: rgb(144, 140, 170); */
+		/* --rp-text: rgb(224, 222, 244); */
+		/* --rp-love: rgb(235, 111, 146); */
+		/* --rp-gold: rgb(246, 193, 119); */
+		/* --rp-rose: rgb(235, 188, 186); */
+		/* --rp-pine: rgb(49, 116, 143); */
+		/* --rp-foam: rgb(156, 207, 216); */
+		/* --rp-iris: rgb(196, 167, 231); */
+		/* --rp-highlight-low: rgb(33, 32, 46); */
+		/* --rp-highlight-med: rgb(64, 61, 82); */
+		/* --rp-highlight-high: rgb(82, 79, 103); */
+
+		/* Rosé Pine Moon */
+		--rp-base: rgb(35, 33, 54);
+		--rp-surface: rgb(42, 39, 63);
+		--rp-overlay: rgb(57, 53, 82);
+		--rp-muted: rgb(110, 106, 134);
+		--rp-subtle: rgb(144, 140, 170);
+		--rp-text: rgb(224, 222, 244);
+		--rp-love: rgb(235, 111, 146);
+		--rp-gold: rgb(246, 193, 119);
+		--rp-rose: rgb(234, 154, 151);
+		--rp-pine: rgb(62, 143, 176);
+		--rp-foam: rgb(156, 207, 216);
+		--rp-iris: rgb(196, 167, 231);
+		--rp-highlight-low: rgb(42, 40, 62);
+		--rp-highlight-med: rgb(68, 65, 90);
+		--rp-highlight-high: rgb(86, 82, 110);
+	}
+}
+/* End Rosé Pine*/
+
+html {
+	background-color: var(--rp-base);
+	color: var(--rp-text);
+}
+
+::selection {
+	background-color: var(--rp-gold);
+}
+
 header {
 	display: flex;
 	justify-content: space-between;
-	background: wheat;
 	align-items: flex-end;
 	min-height: 3rem;
+	border-bottom: 1px solid var(--rp-muted);
 }
 
 .logo {
@@ -18,20 +86,71 @@ header {
 		list-style: none;
 		margin: 0;
 		font-size: 1.5rem;
+		padding: 0;
 
 		li {
 			display: inline;
 			padding-inline: 1ch;
 			padding-top: 0.5rem;
-			background: burlywood;
+
+			a {
+				color: inherit;
+				text-decoration: none;
+			}
+
+		}
+
+		li:hover {
+			background-color: var(--rp-highlight-med);
 		}
 	}
 }
 
+main {
+	max-width: 60rem;
+	margin: auto;
+}
+
+.recipe-metadata-container {
+	display: flex;
+
+	div:nth-child(n +1) {
+		padding-left: 1rem;
+	}
+}
+
+.open-ingredient-popup {
+	position: fixed;
+	bottom: 0.5rem;
+	right: 0.5rem;
+}
+
+.ingredient-popup {
+	background-color: var(--rp-base);
+	border-color: var(--rp-highlight-high);
+	color: var(--rp-text);
+}
+
+li a:focus-visible {
+	outline: none;
+}
+
+input:focus-visible,
+textarea:focus-visible,
+button:focus-visible,
+li:has(a:focus-visible) {
+	outline: 2px solid var(--rp-foam);
+	border-radius: 0.25rem;
+}
+
+.form-group {
+	margin-top: 1rem;
+}
+
 input:user-invalid,
 textarea:user-invalid{
-	background-color: ivory;
-	border-color: red;
+	background-color: var(--rp-highlight-med);
+	border-color: var(--rp-love);
 }
 
 .ingredient-error {
@@ -40,4 +159,32 @@ textarea:user-invalid{
 
 .ingredient-area:user-invalid + .ingredient-error {
 	visibility: visible;
+}
+
+input[type="text"],
+textarea {
+	background-color: var(--rp-surface);
+	border: 1px solid var(--rp-muted);
+	border-radius: 0.25rem;
+}
+
+input::file-selector-button,
+input[type="submit"],
+button {
+	color: inherit;
+	border: transparent;
+	border-radius: 0.25rem;
+	padding: 0.25rem;
+	background-color: var(--rp-highlight-med);
+
+	&:hover {
+		background-color: var(--rp-highlight-high);
+	}
+}
+
+/* Seems like this should be covered by the & above, but it's not,
+ * so we explicitly set the hover here
+ */
+input::file-selector-button:hover {
+	background-color: var(--rp-highlight-high);
 }

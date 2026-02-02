@@ -15,14 +15,29 @@
 
 {{define "content"}}
 	<h1>Recipe Name</h1>
-	<div>
-	<p>By: {{.Author}}</p>
-	<p>Uploaded by: {{.Uploader}}</p>
+	<div class="recipe-metadata-container">
+		<div class="recipe-metadata">
+			<p><b>By:</b></p>
+			<p>{{.Author}}</p>
+		</div>
+		<div class="recipe-metadata">
+			<p><b>Uploaded by:</b></p>
+			<p>{{.Uploader}}</p>
+		</div>
 	</div>
-	<div>
-	<p>Prep time: <time>{{.PrepTime}}</time></p>
-	<p>Total time: <time>{{.TotalTime}}</time></p>
-	<p>Yield: {{.Yield}}</p>
+	<div class="recipe-metadata-container">
+		<div class="recipe-metadata">
+			<p><b>Prep time:</b></p>
+			<p><time>{{.PrepTime}}</time></p>
+		</div>
+		<div class="recipe-metadata">
+			<p><b>Total time:</b></p>
+			<p><time>{{.TotalTime}}</time></p>
+		</div>
+		<div class="recipe-metadata">
+			<p><b>Yield:</b></p>
+			<p>{{.Yield}}</p>
+		</div>
 	</div>
 	<img>
 	<h2>Ingredients:</h2>
@@ -39,8 +54,8 @@
 		{{end}}
 	{{end}}
 	</main>
-	<button id="open-ingredient-popup">Show Ingredients</button>
-	<dialog id="ingredient-popup" closedby="any">
+	<button class="open-ingredient-popup" id="open-ingredient-popup">Show Ingredients</button>
+	<dialog class="ingredient-popup" id="ingredient-popup" closedby="any">
 	<button id="close-ingredient-popup" autofocus>Close Ingredients</button>
 	{{template "ingredientsList" .}}
 	</dialog>
