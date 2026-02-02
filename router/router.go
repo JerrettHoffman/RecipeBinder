@@ -75,6 +75,8 @@ func formatIngredientSections(ingredientText string) []ingredientSection {
 	return outIngredientSections
 }
 
+// Take in string of steps text and separate it into sections with headers
+// and individual steps
 func formatStepSections(stepText string) []stepSection {
 	outStepSections := make([]stepSection, 1)
 
