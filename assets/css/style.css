@@ -28,3 +28,16 @@ header {
 	}
 }
 
+input:user-invalid,
+textarea:user-invalid{
+	background-color: ivory;
+	border-color: red;
+}
+
+.ingredient-error {
+	visibility: hidden;
+}
+
+.ingredient-area:user-invalid + .ingredient-error {
+	visibility: visible;
+}

@@ -23,7 +23,7 @@ func (t TestRecipeBuilder) BuildRecipe() RecipeData {
 		PrepTime:    prepTime,
 		TotalTime:   totalTime,
 		Yield:       "4 Dolor",
-		Ingredients: "4 Cups lorem, A pinch of ipsum",
+		Ingredients: "* 4 Cups lorem\r\n* A pinch of ipsum",
 		Image:       "lorem ipsum image",
 		Steps:       "1. Lorem \n 2.Ipsum \n 3.I hope the new lines work?",
 	}

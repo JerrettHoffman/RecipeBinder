@@ -1,9 +1,16 @@
 {{define "ingredientsList"}}
-<ul>
-{{range .Ingredients}}
-<li>{{.}}</li>
-{{end}}
-</ul>
+	{{range .IngredientSections}}
+		{{if .Header}}
+		<h3>{{.Header}}</h3>
+		{{end}}
+		<ul>
+		{{range .Ingredients}}
+			{{if .}}
+				<li>{{.}}</li>
+			{{end}}
+		{{end}}
+		</ul>
+	{{end}}
 {{end}}
 
 {{define "content"}}
@@ -19,14 +26,23 @@
 	</div>
 	<img>
 	<h2>Ingredients:</h2>
-	{{.Ingredients}}
+	{{template "ingredientsList" .}}
 	<h2>Steps:</h2>
-	<p>{{.Steps}}</p>
+	{{range .StepSections}}
+		{{if .Header}}
+		<h3>{{.Header}}</h3>
+		{{end}}
+		{{range .Steps}}
+			{{if .}}
+			<p>{{.}}</p>
+			{{end}}
+		{{end}}
+	{{end}}
 	</main>
 	<button id="open-ingredient-popup">Show Ingredients</button>
 	<dialog id="ingredient-popup" closedby="any">
 	<button id="close-ingredient-popup" autofocus>Close Ingredients</button>
-	{{.Ingredients}}
+	{{template "ingredientsList" .}}
 	</dialog>
 	<script>
 	const dialog = document.getElementById("ingredient-popup");

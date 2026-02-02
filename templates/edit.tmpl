@@ -1,0 +1,68 @@
+{{define "content"}}
+	<form action="/edit/1" method="post">
+		<div class="form-group">
+			<label for=recipe-name">Recipe Name</label>
+			<input type="text" id="recipe-name" name="recipe-name">
+		</div>
+		<div class="form-group">
+			<label for=author">Author:</label>
+			<input type="text" id="author" name="author">
+		</div>
+		<div class="form-group">
+			<label for=uploader">Uploader:</label>
+			<input type="text" id="uploader" name="uploader">
+		</div>
+		<div class="form-group">
+			<label for=prep-time">Prep time:</label>
+			<input type="text" id="prep-time" name="prep-time">
+		</div>
+		<div class="form-group">
+			<label for=total-time">Total time:</label>
+			<input type="text" id="total-time" name="total-time">
+		</div>
+		<div class="form-group">
+			<label for=yield">Yield:</label>
+			<input type="text" id="yield" name="yield">
+		</div>
+		<div class="form-group">
+			<label for=final-image">Final Image:</label>
+			<input type="file" id="final-image" name="final-image">
+			<img class="final-image-preview" id="final-image-preview">
+			<script>
+			const imageInput = document.getElementById("final-image");
+			const imagePreview = document.getElementById("final-image-preview");
+
+			imageInput.addEventListener("change", (e) => {
+				if (e.target.files.length > 0) {
+					imagePreview.src = URL.createObjectURL(e.target.files[0]);
+					imagePreview.onload = function cleanup() {
+						URL.revokeObjectURL(imagePreview.src);
+					};
+				}
+			});
+			</script>
+		</div>
+		<div class="form-group">
+			<label for=ingredients">Ingredients:</label>
+			<textarea class="ingredient-area" id="ingredients" name="ingredients" required></textarea>
+			<p class="ingredient-error" id="ingredient-error">Error (Invalid Formatting): Lines must begin with "## " (denoting a section header) or "* " (denoting an ingredient)</p>
+			<script>
+			const ingredientArea = document.getElementById("ingredients");
+			ingredientArea.addEventListener("blur", (e) => {
+				// Match lines that don't start with "## " or "* " and are non-empty
+				if (ingredientArea.value.match(/^(?!(?:## |\* ).+|$)/m)) {
+					ingredientArea.setCustomValidity("Error: Incorrect formatting");
+				}
+			});
+			ingredientArea.addEventListener("focus", (e) => {
+				ingredientArea.setCustomValidity("");
+			});
+			</script>
+		</div>
+		<div class="form-group">
+			<label for=steps">Steps:</label>
+			<textarea id="steps" name="steps"></textarea>
+		</div>
+		<input type="submit" value="Submit">
+	</form>
+{{end}}
