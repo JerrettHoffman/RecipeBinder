@@ -44,7 +44,20 @@
 		</div>
 		<div class="form-group">
 			<label for=ingredients">Ingredients:</label>
-			<textarea id="ingredients" name="ingredients"></textarea>
+			<textarea class="ingredient-area" id="ingredients" name="ingredients" required></textarea>
+			<p class="ingredient-error" id="ingredient-error">Error (Invalid Formatting): Lines must begin with "## " (denoting a section header) or "* " (denoting an ingredient)</p>
+			<script>
+			const ingredientArea = document.getElementById("ingredients");
+			ingredientArea.addEventListener("blur", (e) => {
+				// Match lines that don't start with "## " or "* " and are non-empty
+				if (ingredientArea.value.match(/^(?!(?:## |\* ).+|$)/m)) {
+					ingredientArea.setCustomValidity("Error: Incorrect formatting");
+				}
+			});
+			ingredientArea.addEventListener("focus", (e) => {
+				ingredientArea.setCustomValidity("");
+			});
+			</script>
 		</div>
 		<div class="form-group">
 			<label for=steps">Steps:</label>

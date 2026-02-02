@@ -13,7 +13,7 @@ import (
 
 const (
 	maxIngredientCapacity = 100
-	headerMarkup          = "##"
+	headerMarkup          = "## "
 	bulletMarkup          = "* "
 )
 

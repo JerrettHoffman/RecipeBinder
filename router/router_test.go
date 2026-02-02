@@ -34,7 +34,7 @@ func Test_formatStepSections(t *testing.T) {
 		},
 		{
 			name:     "One Section Start",
-			stepText: "##Section one\r\nTest this out\r\nWith another line\r\n",
+			stepText: "## Section one\r\nTest this out\r\nWith another line\r\n",
 			want: []stepSection{
 				{
 					Header: "",
@@ -48,7 +48,7 @@ func Test_formatStepSections(t *testing.T) {
 		},
 		{
 			name:     "Two Sections Start",
-			stepText: "##Section one\r\nTest this out\r\nWith another line\r\n##Section two\r\nNew lines added\r\n",
+			stepText: "## Section one\r\nTest this out\r\nWith another line\r\n## Section two\r\nNew lines added\r\n",
 			want: []stepSection{
 				{
 					Header: "",
@@ -66,7 +66,7 @@ func Test_formatStepSections(t *testing.T) {
 		},
 		{
 			name:     "Two Lines then One Section",
-			stepText: "First line\r\n##Section one\r\nTest this out\r\nWith another line\r\n",
+			stepText: "First line\r\n## Section one\r\nTest this out\r\nWith another line\r\n",
 			want: []stepSection{
 				{
 					Header: "",
@@ -80,7 +80,7 @@ func Test_formatStepSections(t *testing.T) {
 		},
 		{
 			name:     "Extra newlines",
-			stepText: "First line\r\n\r\n\r\n##Section one\r\nTest this out\r\nWith another line\r\n",
+			stepText: "First line\r\n\r\n\r\n## Section one\r\nTest this out\r\nWith another line\r\n",
 			want: []stepSection{
 				{
 					Header: "",
@@ -144,7 +144,7 @@ func Test_formatIngredientSections(t *testing.T) {
 		},
 		{
 			name:           "One section",
-			ingredientText: "##Section One\r\n* 1 Tablespoon salt\r\n",
+			ingredientText: "## Section One\r\n* 1 Tablespoon salt\r\n",
 			want: []ingredientSection{
 				{
 					Header:      "",
@@ -158,7 +158,7 @@ func Test_formatIngredientSections(t *testing.T) {
 		},
 		{
 			name:           "Two sections",
-			ingredientText: "##Section One\r\n* 1 Tablespoon salt\r\n##Section Two\r\n* 2 Cups flour\r\n",
+			ingredientText: "## Section One\r\n* 1 Tablespoon salt\r\n## Section Two\r\n* 2 Cups flour\r\n",
 			want: []ingredientSection{
 				{
 					Header:      "",
