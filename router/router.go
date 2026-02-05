@@ -20,6 +20,7 @@ const (
 var (
 	readTpl *template.Template
 	editTpl *template.Template
+	searchTpl *template.Template
 )
 
 type ingredientSection struct {
@@ -45,8 +46,10 @@ func (router *Router) Setup() {
 	router.Mux.HandleFunc("/read/{id}", router.readRecipeHandler)
 	router.Mux.HandleFunc("GET /edit/{id}", router.editGetRecipeHandler)
 	router.Mux.HandleFunc("POST /edit/{id}", router.editPostRecipeHandler)
+	router.Mux.HandleFunc("GET /search", router.searchGetRecipeHandler)
 	readTpl = template.Must(template.ParseFiles("templates/base.tmpl", "templates/header.tmpl", "templates/read.tmpl"))
 	editTpl = template.Must(template.ParseFiles("templates/base.tmpl", "templates/header.tmpl", "templates/edit.tmpl"))
+	searchTpl = template.Must(template.ParseFiles("templates/base.tmpl", "templates/header.tmpl", "templates/search.tmpl"))
 }
 
 // Take in string of ingredient text and separate it into sections with headers
@@ -205,4 +208,11 @@ func (router *Router) editPostRecipeHandler(w http.ResponseWriter, r *http.Reque
 	log.Printf("%v", dbData)
 
 	// Reroute to the new read page for the created index
+}
+
+func (router *Router) searchGetRecipeHandler(w http.ResponseWriter, r *http.Request) {
+	if err := searchTpl.Execute(w, nil); err != nil {
+		log.Printf("Failed to execute searchGet %v\n", err)
+		http.Error(w, "server error", http.StatusInternalServerError)
+	}
 }

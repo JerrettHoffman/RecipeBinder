@@ -143,8 +143,14 @@ li:has(a:focus-visible) {
 	border-radius: 0.25rem;
 }
 
+.recipe-form > * {
+	padding-block: 1rem;
+}
+
 .form-group {
 	margin-top: 1rem;
+	display: flex;
+	justify-content: space-between;
 }
 
 input:user-invalid,
@@ -153,11 +159,17 @@ textarea:user-invalid{
 	border-color: var(--rp-love);
 }
 
-.ingredient-error {
-	visibility: hidden;
+.textarea-group {
+	display: grid;
 }
 
-.ingredient-area:user-invalid + .ingredient-error {
+.ingredient-error {
+	visibility: hidden;
+	color: var(--rp-love);
+}
+
+.ingredient-error:has(+ .ingredient-area:user-invalid) {
+
 	visibility: visible;
 }
 
@@ -187,4 +199,18 @@ button {
  */
 input::file-selector-button:hover {
 	background-color: var(--rp-highlight-high);
+}
+
+.single-item-groups {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+	grid-gap: 1rem;
+}
+
+.ingredient-container {
+	padding-bottom: 2rem;
+}
+
+.ingredient-group {
+	padding-block: 0.5rem;
 }
