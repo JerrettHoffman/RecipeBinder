@@ -537,6 +537,7 @@ textarea {
 	background-color: var(--rp-surface);
 	border: 1px solid var(--rp-muted);
 	border-radius: 0.25rem;
+	color: inherit;
 }
 
 input::file-selector-button,
