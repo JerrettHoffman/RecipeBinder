@@ -1,30 +1,32 @@
 {{define "content"}}
-	<form action="/edit/1" method="post">
-		<div class="form-group">
-			<label for="recipe-name">Recipe Name</label>
-			<input type="text" id="recipe-name" name="recipe-name">
+	<form class="recipe-form" action="/edit/1" method="pcyproost">
+		<div class="single-item-groups">
+			<div class="form-group">
+				<label for="recipe-name">Recipe Name:</label>
+				<input type="text" id="recipe-name" name="recipe-name">
+			</div>
+			<div class="form-group">
+				<label for="author">Author:</label>
+				<input type="text" id="author" name="author">
+			</div>
+			<div class="form-group">
+				<label for="uploader">Uploader:</label>
+				<input type="text" id="uploader" name="uploader">
+			</div>
+			<div class="form-group">
+				<label for="prep-time">Prep time:</label>
+				<input type="text" id="prep-time" name="prep-time">
+			</div>
+			<div class="form-group">
+				<label for="total-time">Total time:</label>
+				<input type="text" id="total-time" name="total-time">
+			</div>
+			<div class="form-group">
+				<label for="yield">Yield:</label>
+				<input type="text" id="yield" name="yield">
+			</div>
 		</div>
-		<div class="form-group">
-			<label for="author">Author:</label>
-			<input type="text" id="author" name="author">
-		</div>
-		<div class="form-group">
-			<label for="uploader">Uploader:</label>
-			<input type="text" id="uploader" name="uploader">
-		</div>
-		<div class="form-group">
-			<label for="prep-time">Prep time:</label>
-			<input type="text" id="prep-time" name="prep-time">
-		</div>
-		<div class="form-group">
-			<label for="total-time">Total time:</label>
-			<input type="text" id="total-time" name="total-time">
-		</div>
-		<div class="form-group">
-			<label for="yield">Yield:</label>
-			<input type="text" id="yield" name="yield">
-		</div>
-		<div class="form-group">
+		<div class="image-upload-container">
 			<label for="final-image">Final Image:</label>
 			<input type="file" id="final-image" name="final-image">
 			<img class="final-image-preview" id="final-image-preview">
@@ -42,10 +44,10 @@
 			});
 			</script>
 		</div>
-		<div class="form-group">
+		<div class="textarea-group">
 			<label for="ingredients">Ingredients:</label>
+			<span class="ingredient-error" id="ingredient-error">Error (Invalid Formatting): Lines must begin with "## " (denoting a section header) or "* " (denoting an ingredient)</span>
 			<textarea class="ingredient-area" id="ingredients" name="ingredients" required></textarea>
-			<p class="ingredient-error" id="ingredient-error">Error (Invalid Formatting): Lines must begin with "## " (denoting a section header) or "* " (denoting an ingredient)</p>
 			<script>
 			const ingredientArea = document.getElementById("ingredients");
 			ingredientArea.addEventListener("blur", (e) => {
@@ -59,7 +61,7 @@
 			});
 			</script>
 		</div>
-		<div class="form-group">
+		<div class="textarea-group">
 			<label for="steps">Steps:</label>
 			<textarea id="steps" name="steps"></textarea>
 		</div>

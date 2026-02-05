@@ -1,5 +1,5 @@
 {{define "content"}}
-	<form action="/search" method="post">
+	<form class="recipe-form" action="/search" method="post">
 		<div class="single-item-groups">
 			<div class="form-group">
 				<label for="recipe-name">Recipe Name:</label>
@@ -41,10 +41,7 @@
 				const ingredientsContainer = document.getElementById("ingredients-container");
 				const ingredientCount = document.getElementById("ingredient-count");
 
-				// Remove this and just do queryselector of .form-group within the ingredient group?
-				var ingredientList = [];
-
-				function recalculateIngredientIds() {
+				function reassignIngredientIds(ingredientList) {
 					ingredientList.forEach((ingredientFormGroup, i) => {
 						// Rename the inputs
 						let ingredientInput = ingredientFormGroup.querySelector("input");
@@ -60,8 +57,8 @@
 					let button = ingredientFormGroup.querySelector("button");
 					button.addEventListener("click", () => {
 						ingredientFormGroup.remove();
-						ingredientList = ingredientList.filter((ingredient) => ingredient.isConnected);
-						recalculateIngredientIds();
+						let ingredientList = document.querySelectorAll(".ingredient-group");
+						reassignIngredientIds(ingredientList);
 						ingredientCount.value = ingredientList.length;
 					});
 				}
@@ -73,15 +70,15 @@
 						const template = document.querySelector("#ingredient-template");
 						const clone = document.importNode(template.content, true);
 
-						// Add the form group to our list, and re-calculate the IDs
 						let ingredientGroup = clone.children[0];
-						ingredientList.push(ingredientGroup);
 						setupRemoval(ingredientGroup);
-						recalculateIngredientIds();
-						ingredientCount.value = ingredientList.length;
 
 						// Add the clone to the container
 						ingredientsContainer.insertBefore(clone, addIngredientButton);
+
+						let ingredientList = document.querySelectorAll(".ingredient-group");
+						reassignIngredientIds(ingredientList);
+						ingredientCount.value = ingredientList.length;
 					}
 				});
 			</script>

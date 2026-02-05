@@ -143,6 +143,10 @@ li:has(a:focus-visible) {
 	border-radius: 0.25rem;
 }
 
+.recipe-form > * {
+	padding-block: 1rem;
+}
+
 .form-group {
 	margin-top: 1rem;
 	display: flex;
@@ -155,11 +159,17 @@ textarea:user-invalid{
 	border-color: var(--rp-love);
 }
 
-.ingredient-error {
-	visibility: hidden;
+.textarea-group {
+	display: grid;
 }
 
-.ingredient-area:user-invalid + .ingredient-error {
+.ingredient-error {
+	visibility: hidden;
+	color: var(--rp-love);
+}
+
+.ingredient-error:has(+ .ingredient-area:user-invalid) {
+
 	visibility: visible;
 }
 
