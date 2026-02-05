@@ -1,0 +1,91 @@
+{{define "content"}}
+	<form action="/search" method="post">
+		<div class="single-item-groups">
+			<div class="form-group">
+				<label for="recipe-name">Recipe Name:</label>
+				<input type="text" id="recipe-name" name="recipe-name">
+			</div>
+			<div class="form-group">
+				<label for="author">Author:</label>
+				<input type="text" id="author" name="author">
+			</div>
+			<div class="form-group">
+				<label for="uploader">Uploader:</label>
+				<input type="text" id="uploader" name="uploader">
+			</div>
+			<div class="form-group">
+				<label for="prep-time">Prep time:</label>
+				<input type="text" id="prep-time" name="prep-time">
+			</div>
+			<div class="form-group">
+				<label for="total-time">Total time:</label>
+				<input type="text" id="total-time" name="total-time">
+			</div>
+			<div class="form-group">
+				<label for="yield">Yield:</label>
+				<input type="text" id="yield" name="yield">
+			</div>
+		</div>
+		<div id="ingredients-container" class="ingredient-container">
+			<p>Ingredients:</p>
+			<input type="hidden" id="ingredient-count" name="ingredient-count" value="0">
+			<template id="ingredient-template">
+				<div class="ingredient-group">
+					<input type="text" id="ingredient-0" name="ingredient-0">
+					<button id="remove-ingredient-0" type="button">Remove</button>
+				</div>
+			</template>
+			<button id="add-ingredient" type="button">Add Ingredient</button>
+			<script>
+				const addIngredientButton = document.getElementById("add-ingredient");
+				const ingredientsContainer = document.getElementById("ingredients-container");
+				const ingredientCount = document.getElementById("ingredient-count");
+
+				// Remove this and just do queryselector of .form-group within the ingredient group?
+				var ingredientList = [];
+
+				function recalculateIngredientIds() {
+					ingredientList.forEach((ingredientFormGroup, i) => {
+						// Rename the inputs
+						let ingredientInput = ingredientFormGroup.querySelector("input");
+						ingredientInput.id = "ingredient-" + i;
+						ingredientInput.name = "ingredient-" + i;
+						// Rename the buttons
+						let ingredientRemoveButton = ingredientFormGroup.querySelector("button");
+						ingredientRemoveButton.id = "remove-ingredient-" + i;
+					});
+				}
+
+				function setupRemoval(ingredientFormGroup) {
+					let button = ingredientFormGroup.querySelector("button");
+					button.addEventListener("click", () => {
+						ingredientFormGroup.remove();
+						ingredientList = ingredientList.filter((ingredient) => ingredient.isConnected);
+						recalculateIngredientIds();
+						ingredientCount.value = ingredientList.length;
+					});
+				}
+
+				addIngredientButton.addEventListener("click", () => {
+					// Test to see if the browser supports the HTML template element by checking
+					// for the presence of the template element's content attribute.
+					if ("content" in document.createElement("template")) {
+						const template = document.querySelector("#ingredient-template");
+						const clone = document.importNode(template.content, true);
+
+						// Add the form group to our list, and re-calculate the IDs
+						let ingredientGroup = clone.children[0];
+						ingredientList.push(ingredientGroup);
+						setupRemoval(ingredientGroup);
+						recalculateIngredientIds();
+						ingredientCount.value = ingredientList.length;
+
+						// Add the clone to the container
+						ingredientsContainer.insertBefore(clone, addIngredientButton);
+					}
+				});
+			</script>
+		</div>
+		<input type="submit" value="Submit">
+	</form>
+{{end}}

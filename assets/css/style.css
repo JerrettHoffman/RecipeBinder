@@ -145,6 +145,8 @@ li:has(a:focus-visible) {
 
 .form-group {
 	margin-top: 1rem;
+	display: flex;
+	justify-content: space-between;
 }
 
 input:user-invalid,
@@ -187,4 +189,18 @@ button {
  */
 input::file-selector-button:hover {
 	background-color: var(--rp-highlight-high);
+}
+
+.single-item-groups {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+	grid-gap: 1rem;
+}
+
+.ingredient-container {
+	padding-bottom: 2rem;
+}
+
+.ingredient-group {
+	padding-block: 0.5rem;
 }
