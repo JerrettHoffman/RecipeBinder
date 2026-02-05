@@ -212,7 +212,7 @@ func (router *Router) editPostRecipeHandler(w http.ResponseWriter, r *http.Reque
 
 func (router *Router) searchGetRecipeHandler(w http.ResponseWriter, r *http.Request) {
 	if err := searchTpl.Execute(w, nil); err != nil {
-		log.Printf("Failed to execute editGet %v\n", err)
+		log.Printf("Failed to execute searchGet %v\n", err)
 		http.Error(w, "server error", http.StatusInternalServerError)
 	}
 }
