@@ -119,7 +119,7 @@ func (router *Router) readRecipeHandler(w http.ResponseWriter, r *http.Request) 
 
 	// Todo: use id for actual lookup of data
 	builder := internal.TestRecipeDataStrategy{}
-	recipeData := builder.BuildRecipe(1)
+	recipeData := builder.ReadRecipe(1)
 
 	// Format the times
 	prepTimeHours := int(recipeData.PrepTime.Hours())
@@ -155,7 +155,7 @@ func (router *Router) readRecipeHandler(w http.ResponseWriter, r *http.Request) 
 func (router *Router) editGetRecipeHandler(w http.ResponseWriter, r *http.Request) {
 	// Todo: use id for actual lookup of data
 	builder := internal.TestRecipeDataStrategy{}
-	recipeData := builder.BuildRecipe(1)
+	recipeData := builder.ReadRecipe(1)
 
 	if err := editTpl.Execute(w, recipeData); err != nil {
 		log.Printf("Failed to execute editGet %v\n", err)
