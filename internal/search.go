@@ -19,12 +19,12 @@ type SearchResult struct {
 }
 
 type RecipeSearch interface {
-	search(params SearchParams) []SearchResult
+	Search(params SearchParams) []SearchResult
 }
 
 type TestSearch struct{}
 
-func (t TestSearch) search(params SearchParams) []SearchResult {
+func (t TestSearch) Search(params SearchParams) []SearchResult {
 	return []SearchResult{{
 		recipeName: "Test Recipe 1",
 		recipeId:   1,
