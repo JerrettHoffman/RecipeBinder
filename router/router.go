@@ -18,8 +18,8 @@ const (
 )
 
 var (
-	readTpl *template.Template
-	editTpl *template.Template
+	readTpl   *template.Template
+	editTpl   *template.Template
 	searchTpl *template.Template
 )
 
@@ -63,14 +63,14 @@ func formatIngredientSections(ingredientText string) []ingredientSection {
 
 	lines := regexp.MustCompile("\r?\n").Split(ingredientText, -1)
 	for _, line := range lines {
-		if trimmedHeader, foundPrefix :=strings.CutPrefix(line, headerMarkup); foundPrefix  {
+		if trimmedHeader, foundPrefix := strings.CutPrefix(line, headerMarkup); foundPrefix {
 			outIngredientSections = append(outIngredientSections, ingredientSection{
 				Header:      trimmedHeader,
 				Ingredients: make([]string, 0, 3),
 			})
 			sectionIndex++
 			currentSection = &outIngredientSections[sectionIndex]
-		} else if trimmedBullet, foundPrefix :=strings.CutPrefix(line, bulletMarkup); foundPrefix  {
+		} else if trimmedBullet, foundPrefix := strings.CutPrefix(line, bulletMarkup); foundPrefix {
 			currentSection.Ingredients = append(currentSection.Ingredients, trimmedBullet)
 		}
 	}
@@ -89,7 +89,7 @@ func formatStepSections(stepText string) []stepSection {
 
 	lines := regexp.MustCompile("\r?\n").Split(stepText, -1)
 	for _, line := range lines {
-		if trimmedHeader, foundPrefix :=strings.CutPrefix(line, headerMarkup); foundPrefix  {
+		if trimmedHeader, foundPrefix := strings.CutPrefix(line, headerMarkup); foundPrefix {
 			outStepSections = append(outStepSections, stepSection{
 				Header: trimmedHeader,
 				Steps:  make([]string, 0, 3),
@@ -106,14 +106,14 @@ func formatStepSections(stepText string) []stepSection {
 
 func (router *Router) readRecipeHandler(w http.ResponseWriter, r *http.Request) {
 	type data struct {
-		RecipeName          string
-		Author              string
-		Uploader            string
-		PrepTime            string
-		TotalTime           string
-		Yield               string
+		RecipeName         string
+		Author             string
+		Uploader           string
+		PrepTime           string
+		TotalTime          string
+		Yield              string
 		IngredientSections []ingredientSection
-		Image               string
+		Image              string
 		StepSections       []stepSection
 	}
 
