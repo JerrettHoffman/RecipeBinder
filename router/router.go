@@ -45,6 +45,7 @@ func (router *Router) Setup() {
 	fs := http.FileServer(http.Dir("assets"))
 	router.Mux.Handle("/assets/", http.StripPrefix("/assets/", fs))
 	router.Mux.HandleFunc("/read/{id}", router.readRecipeHandler)
+	router.Mux.HandleFunc("GET /create", router.createGetRecipeHandler)
 	router.Mux.HandleFunc("GET /edit/{id}", router.editGetRecipeHandler)
 	router.Mux.HandleFunc("POST /edit/{id}", router.editPostRecipeHandler)
 	router.Mux.HandleFunc("GET /search", router.searchGetRecipeHandler)
@@ -223,6 +224,13 @@ func (router *Router) searchGetRecipeHandler(w http.ResponseWriter, r *http.Requ
 func (router *Router) addGetRecipeHandler(w http.ResponseWriter, r *http.Request) {
 	if err := addTpl.Execute(w, nil); err != nil {
 		log.Printf("Failed to execute addGet %v\n", err)
+		http.Error(w, "server error", http.StatusInternalServerError)
+	}
+}
+
+func (router *Router) createGetRecipeHandler(w http.ResponseWriter, r *http.Request) {
+	if err := editTpl.Execute(w, nil); err != nil {
+		log.Printf("Failed to execute createGet %v\n", err)
 		http.Error(w, "server error", http.StatusInternalServerError)
 	}
 }
