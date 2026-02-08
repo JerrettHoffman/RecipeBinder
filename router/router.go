@@ -21,6 +21,7 @@ var (
 	readTpl   *template.Template
 	editTpl   *template.Template
 	searchTpl *template.Template
+	addTpl    *template.Template
 )
 
 type ingredientSection struct {
@@ -47,9 +48,11 @@ func (router *Router) Setup() {
 	router.Mux.HandleFunc("GET /edit/{id}", router.editGetRecipeHandler)
 	router.Mux.HandleFunc("POST /edit/{id}", router.editPostRecipeHandler)
 	router.Mux.HandleFunc("GET /search", router.searchGetRecipeHandler)
+	router.Mux.HandleFunc("GET /add", router.addGetRecipeHandler)
 	readTpl = template.Must(template.ParseFiles("templates/base.tmpl", "templates/header.tmpl", "templates/read.tmpl"))
 	editTpl = template.Must(template.ParseFiles("templates/base.tmpl", "templates/header.tmpl", "templates/edit.tmpl"))
 	searchTpl = template.Must(template.ParseFiles("templates/base.tmpl", "templates/header.tmpl", "templates/search.tmpl"))
+	addTpl = template.Must(template.ParseFiles("templates/base.tmpl", "templates/header.tmpl", "templates/add.tmpl"))
 }
 
 // Take in string of ingredient text and separate it into sections with headers
@@ -213,6 +216,13 @@ func (router *Router) editPostRecipeHandler(w http.ResponseWriter, r *http.Reque
 func (router *Router) searchGetRecipeHandler(w http.ResponseWriter, r *http.Request) {
 	if err := searchTpl.Execute(w, nil); err != nil {
 		log.Printf("Failed to execute searchGet %v\n", err)
+		http.Error(w, "server error", http.StatusInternalServerError)
+	}
+}
+
+func (router *Router) addGetRecipeHandler(w http.ResponseWriter, r *http.Request) {
+	if err := addTpl.Execute(w, nil); err != nil {
+		log.Printf("Failed to execute addGet %v\n", err)
 		http.Error(w, "server error", http.StatusInternalServerError)
 	}
 }
