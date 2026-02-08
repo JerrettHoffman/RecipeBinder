@@ -26,40 +26,11 @@
 				<input type="text" id="yield" name="yield">
 			</div>
 		</div>
-		<div class="image-upload-container">
-			<label for="final-image">Final Image:</label>
-			<input type="file" id="final-image" name="final-image">
-			<img class="final-image-preview" id="final-image-preview">
-			<script>
-			const imageInput = document.getElementById("final-image");
-			const imagePreview = document.getElementById("final-image-preview");
-
-			imageInput.addEventListener("change", (e) => {
-				if (e.target.files.length > 0) {
-					imagePreview.src = URL.createObjectURL(e.target.files[0]);
-					imagePreview.onload = function cleanup() {
-						URL.revokeObjectURL(imagePreview.src);
-					};
-				}
-			});
-			</script>
-		</div>
 		<div class="textarea-group">
 			<label for="ingredients">Ingredients:</label>
 			<span class="ingredient-error" id="ingredient-error">Error (Invalid Formatting): Lines must begin with "## " (denoting a section header) or "* " (denoting an ingredient)</span>
 			<textarea class="ingredient-area" id="ingredients" name="ingredients" required></textarea>
-			<script>
-			const ingredientArea = document.getElementById("ingredients");
-			ingredientArea.addEventListener("blur", (e) => {
-				// Match lines that don't start with "## " or "* " and are non-empty
-				if (ingredientArea.value.match(/^(?!(?:## |\* ).+|$)/m)) {
-					ingredientArea.setCustomValidity("Error: Incorrect formatting");
-				}
-			});
-			ingredientArea.addEventListener("focus", (e) => {
-				ingredientArea.setCustomValidity("");
-			});
-			</script>
+			<script type="text/javascript" src="/assets/js/edit-page.js"></script>
 		</div>
 		<div class="textarea-group">
 			<label for="steps">Steps:</label>

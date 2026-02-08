@@ -39,7 +39,6 @@
 			<p>{{.Yield}}</p>
 		</div>
 	</div>
-	<img>
 	<h2>Ingredients:</h2>
 	{{template "ingredientsList" .}}
 	<h2>Steps:</h2>
@@ -59,17 +58,5 @@
 	<button id="close-ingredient-popup" autofocus>Close Ingredients</button>
 	{{template "ingredientsList" .}}
 	</dialog>
-	<script>
-	const dialog = document.getElementById("ingredient-popup");
-	const openButton = document.getElementById("open-ingredient-popup");
-	const closeButton = document.getElementById("close-ingredient-popup");
-
-	openButton.addEventListener("click", () => {
-		dialog.showModal();
-	});
-
-	closeButton.addEventListener("click", () => {
-		dialog.close();
-	});
-	</script>
+	<script type="text/javascript" src="/assets/js/read-page.js"></script>
 {{end}}

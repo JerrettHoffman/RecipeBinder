@@ -63,15 +63,15 @@ func formatIngredientSections(ingredientText string) []ingredientSection {
 
 	lines := regexp.MustCompile("\r?\n").Split(ingredientText, -1)
 	for _, line := range lines {
-		if strings.HasPrefix(line, headerMarkup) {
+		if trimmedHeader, foundPrefix := strings.CutPrefix(line, headerMarkup); foundPrefix {
 			outIngredientSections = append(outIngredientSections, ingredientSection{
-				Header:      strings.TrimPrefix(line, headerMarkup),
+				Header:      trimmedHeader,
 				Ingredients: make([]string, 0, 3),
 			})
 			sectionIndex++
 			currentSection = &outIngredientSections[sectionIndex]
-		} else if strings.HasPrefix(line, bulletMarkup) {
-			currentSection.Ingredients = append(currentSection.Ingredients, strings.TrimPrefix(line, bulletMarkup))
+		} else if trimmedBullet, foundPrefix := strings.CutPrefix(line, bulletMarkup); foundPrefix {
+			currentSection.Ingredients = append(currentSection.Ingredients, trimmedBullet)
 		}
 	}
 
@@ -89,9 +89,9 @@ func formatStepSections(stepText string) []stepSection {
 
 	lines := regexp.MustCompile("\r?\n").Split(stepText, -1)
 	for _, line := range lines {
-		if strings.HasPrefix(line, headerMarkup) {
+		if trimmedHeader, foundPrefix := strings.CutPrefix(line, headerMarkup); foundPrefix {
 			outStepSections = append(outStepSections, stepSection{
-				Header: strings.TrimPrefix(line, headerMarkup),
+				Header: trimmedHeader,
 				Steps:  make([]string, 0, 3),
 			})
 			sectionIndex++
