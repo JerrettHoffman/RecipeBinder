@@ -2,10 +2,11 @@ package internal
 
 import "time"
 
-type TestRecipeBuilder struct {
+// Implements RecipdeDataStrategy
+type TestRecipeDataStrategy struct {
 }
 
-func (t TestRecipeBuilder) BuildRecipe() RecipeData {
+func (t TestRecipeDataStrategy) ReadRecipe(id ID) RecipeData {
 	prepTime, err := time.ParseDuration("1h30m")
 	if err != nil {
 		prepTime = 0
@@ -27,4 +28,16 @@ func (t TestRecipeBuilder) BuildRecipe() RecipeData {
 		Image:       "lorem ipsum image",
 		Steps:       "1. Lorem \n 2.Ipsum \n 3.I hope the new lines work?",
 	}
+}
+
+func (t TestRecipeDataStrategy) UpdateRecipe(recipe RecipeData, recipeId ID) error {
+	return nil
+}
+
+func (t TestRecipeDataStrategy) CreateRecipe(recipe RecipeData) (ID, error) {
+	return 0, nil
+}
+
+func (t TestRecipeDataStrategy) DeleteRecipe(recipeID ID) error {
+	return nil
 }

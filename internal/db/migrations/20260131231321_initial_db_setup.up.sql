@@ -1,23 +1,23 @@
 BEGIN;
 
 CREATE TABLE IF NOT EXISTS ingredients (
-    ingredient_id SERIAL PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS authors (
-    author_id SERIAL PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS users (
-    user_id SERIAL PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     username VARCHAR(255) NOT NULL,
     display_name VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS recipes (
-    recipe_id SERIAL PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     author_id INTEGER NOT NULL,
     uploader_id INTEGER NOT NULL,
@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS recipes (
     total_time INTEGER,
     --image goes here TODO: chat with clove about what this means
     steps TEXT,
-    ingredientText TEXT,
+    ingredient_text TEXT,
     yeild VARCHAR(255),
     FOREIGN KEY(author_id) REFERENCES authors(author_id),
     FOREIGN KEY(uploader_id) REFERENCES users(user_id)

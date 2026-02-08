@@ -2,6 +2,8 @@ package internal
 
 import "time"
 
+type ID int
+
 type RecipeData struct {
 	RecipeName  string
 	Author      string
@@ -14,6 +16,9 @@ type RecipeData struct {
 	Steps       string
 }
 
-type RecipdeDataBuilder interface {
-	BuildRecipe() RecipeData
+type RecipeDataStrategy interface {
+	ReadRecipe(recipeId ID) (RecipeData, error)
+	UpdateRecipe(recipe RecipeData, recipeId ID) error
+	CreateRecipe(recipe RecipeData) (ID, error)
+	DeleteRecipe(recipeId ID) error
 }
