@@ -574,3 +574,14 @@ input::file-selector-button:hover {
 .ingredient-group {
 	padding-block: 0.5rem;
 }
+
+.create-choice-container {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	margin-top: 2rem;
+	justify-items: center;
+
+	a {
+		color: inherit;
+	}
+}

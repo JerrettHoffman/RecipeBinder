@@ -1,40 +1,40 @@
 {{define "content"}}
-	<form class="recipe-form" action="/edit/1" method="pcyproost">
+	<form class="recipe-form" action="{{.SubmitURL}}" method="post">
 		<div class="single-item-groups">
 			<div class="form-group">
 				<label for="recipe-name">Recipe Name:</label>
-				<input type="text" id="recipe-name" name="recipe-name">
+				<input type="text" id="recipe-name" name="recipe-name" value="{{.RecipeName}}" required>
 			</div>
 			<div class="form-group">
 				<label for="author">Author:</label>
-				<input type="text" id="author" name="author">
+				<input type="text" id="author" name="author" value="{{.Author}}" required>
 			</div>
 			<div class="form-group">
 				<label for="uploader">Uploader:</label>
-				<input type="text" id="uploader" name="uploader">
+				<input type="text" id="uploader" name="uploader" value="{{.Uploader}}" required>
 			</div>
 			<div class="form-group">
 				<label for="prep-time">Prep time:</label>
-				<input type="text" id="prep-time" name="prep-time">
+				<input type="text" id="prep-time" name="prep-time" value="{{.PrepTime}}" required>
 			</div>
 			<div class="form-group">
 				<label for="total-time">Total time:</label>
-				<input type="text" id="total-time" name="total-time">
+				<input type="text" id="total-time" name="total-time" value="{{.TotalTime}}" required>
 			</div>
 			<div class="form-group">
 				<label for="yield">Yield:</label>
-				<input type="text" id="yield" name="yield">
+				<input type="text" id="yield" name="yield" value="{{.Yield}}" required>
 			</div>
 		</div>
 		<div class="textarea-group">
 			<label for="ingredients">Ingredients:</label>
 			<span class="ingredient-error" id="ingredient-error">Error (Invalid Formatting): Lines must begin with "## " (denoting a section header) or "* " (denoting an ingredient)</span>
-			<textarea class="ingredient-area" id="ingredients" name="ingredients" required></textarea>
+			<textarea class="ingredient-area" id="ingredients" name="ingredients" required>{{.Ingredients}}</textarea>
 			<script type="text/javascript" src="/assets/js/edit-page.js"></script>
 		</div>
 		<div class="textarea-group">
 			<label for="steps">Steps:</label>
-			<textarea class="steps-area" id="steps" name="steps"></textarea>
+			<textarea class="steps-area" id="steps" name="steps" required>{{.Steps}}</textarea>
 		</div>
 		<input type="submit" value="Submit">
 	</form>
