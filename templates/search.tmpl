@@ -1,34 +1,40 @@
 {{define "content"}}
-	<form class="recipe-form" action="/search" method="post">
+	<form class="recipe-form" action="/search" method="get">
 		<div class="single-item-groups">
 			<div class="form-group">
 				<label for="recipe-name">Recipe Name:</label>
-				<input type="text" id="recipe-name" name="recipe-name">
+				<input type="text" id="recipe-name" name="recipe-name" value="{{.FormData.RecipeName}}">
 			</div>
 			<div class="form-group">
 				<label for="author">Author:</label>
-				<input type="text" id="author" name="author">
+				<input type="text" id="author" name="author" value="{{.FormData.Author}}">
 			</div>
 			<div class="form-group">
 				<label for="uploader">Uploader:</label>
-				<input type="text" id="uploader" name="uploader">
+				<input type="text" id="uploader" name="uploader" value="{{.FormData.Uploader}}">
 			</div>
 			<div class="form-group">
 				<label for="prep-time">Prep time:</label>
-				<input type="text" id="prep-time" name="prep-time">
+				<input type="text" id="prep-time" name="prep-time" value="{{.FormData.PrepTime}}">
 			</div>
 			<div class="form-group">
 				<label for="total-time">Total time:</label>
-				<input type="text" id="total-time" name="total-time">
+				<input type="text" id="total-time" name="total-time" value="{{.FormData.TotalTime}}">
 			</div>
 			<div class="form-group">
 				<label for="yield">Yield:</label>
-				<input type="text" id="yield" name="yield">
+				<input type="text" id="yield" name="yield" value="{{.FormData.Yield}}">
 			</div>
 		</div>
 		<div id="ingredients-container" class="ingredient-container">
 			<p>Ingredients:</p>
-			<input type="hidden" id="ingredient-count" name="ingredient-count" value="0">
+			<input type="hidden" id="ingredient-count" name="ingredient-count" value="{{if .FormData.IngredientCount}}{{.FormData.IngredientCount}}{{else}}0{{end}}">
+			{{range $i, $ingredient := .FormData.Ingredients}}
+			<div class="ingredient-group">
+				<input type="text" id="ingredient-{{$i}}" name="ingredient-{{$i}}" value="{{$ingredient}}">
+				<button id="remove-ingredient-{{$i}}" type="button">Remove</button>
+			</div>
+			{{end}}
 			<template id="ingredient-template">
 				<div class="ingredient-group">
 					<input type="text" id="ingredient-0" name="ingredient-0">
@@ -40,4 +46,9 @@
 		</div>
 		<input type="submit" value="Submit">
 	</form>
+	<ul class="results-link-list">
+		{{range .Results}}
+			<li><a href="/read/{{.RecipeId}}">{{.RecipeName}}</a></li>
+		{{end}}
+	</ul>
 {{end}}

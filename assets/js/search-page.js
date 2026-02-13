@@ -43,3 +43,8 @@ addIngredientButton.addEventListener("click", () => {
 	}
 });
 
+// Set up removal for any ingredients added by the golang template
+let ingredientsList = document.querySelectorAll(".ingredient-group");
+ingredientsList.forEach((ingredientGroup) => {
+	setupRemoval(ingredientGroup)
+});
