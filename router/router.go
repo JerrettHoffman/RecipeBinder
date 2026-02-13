@@ -293,7 +293,93 @@ func (router *Router) editPostRecipeHandler(w http.ResponseWriter, r *http.Reque
 }
 
 func (router *Router) searchGetRecipeHandler(w http.ResponseWriter, r *http.Request) {
-	if err := searchTpl.Execute(w, nil); err != nil {
+	var err error
+
+	if err = r.ParseForm(); err != nil {
+		log.Printf("Failed to parse form: %v", err)
+		http.Error(w, "server error", http.StatusInternalServerError)
+		return
+	}
+
+	type searchFormData struct {
+		RecipeName string
+		Author string
+		Uploader string
+		PrepTime string
+		TotalTime string
+		Yield string
+		IngredientCount string
+		Ingredients []string
+	}
+
+	// Pull the data from the form
+	formData := searchFormData{
+		RecipeName: r.FormValue("recipe-name"),
+		Author: r.FormValue("author"),
+		Uploader: r.FormValue("uploader"),
+		PrepTime: r.FormValue("prep-time"),
+		TotalTime: r.FormValue("total-time"),
+		Yield: r.FormValue("yield"),
+		IngredientCount: r.FormValue("ingredient-count"),
+	}
+
+	// Parse any non-string fields
+	prepTime := time.Second
+	if formData.PrepTime != "" {
+		if prepTime, err = time.ParseDuration(formData.PrepTime); err != nil {
+			log.Printf("Failed to parse prepTime \"%s\": %s", formData.PrepTime, err)
+			http.Error(w, "Invalid form data: Prep Time", http.StatusBadRequest)
+			return
+		}
+	}
+
+	totalTime := time.Second
+	if formData.TotalTime != "" {
+		if totalTime, err = time.ParseDuration(formData.TotalTime); err != nil {
+			log.Printf("Failed to parse totalTime \"%s\": %s", formData.TotalTime, err)
+			http.Error(w, "Invalid form data: Total Time", http.StatusBadRequest)
+			return
+		}
+	}
+
+	if formData.IngredientCount != "" {
+		if ingredientCount, err := strconv.Atoi(formData.IngredientCount); err == nil {
+			ingredientCount = max(0, min(ingredientCount, maxIngredientCapacity))
+			formData.Ingredients = make([]string, 0, ingredientCount)
+			for i := range ingredientCount {
+				formData.Ingredients = append(formData.Ingredients, r.FormValue(fmt.Sprintf("ingredient-%d", i)))
+			}
+		} else {
+			log.Printf("Failed to parse ingredient-count \"%s\": %s", formData.IngredientCount, err)
+			http.Error(w, "Invalid form data: Ingredient Count", http.StatusBadRequest)
+			return
+		}
+	}
+
+	searchParams := internal.SearchParams{
+		RecipeName:   formData.RecipeName,
+		AuthorName:   formData.Author,
+		UploaderName: formData.Uploader,
+		PrepTime:     prepTime,
+		TotalTime:    totalTime,
+		Yeild:        formData.Yield,
+		Ingredients:  formData.Ingredients,
+	}
+
+	searcher := internal.TestSearch{}
+	searchResults := searcher.Search(searchParams)
+
+	type data struct {
+		FormData searchFormData
+		Results []internal.SearchResult
+	}
+
+	pageData := data{
+		FormData: formData,
+		Results: searchResults,
+	}
+
+	if err := searchTpl.Execute(w, pageData); err != nil {
 		log.Printf("Failed to execute searchGet %v\n", err)
 		http.Error(w, "server error", http.StatusInternalServerError)
 	}
