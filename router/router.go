@@ -1,7 +1,9 @@
 package router
 
 import (
+	"RecipeBinder/auth"
 	"RecipeBinder/internal"
+	"context"
 	"errors"
 	"fmt"
 	"log"
@@ -24,6 +26,8 @@ var (
 	editTpl   *template.Template
 	searchTpl *template.Template
 	addTpl    *template.Template
+	loginTpl  *template.Template
+	signupTpl *template.Template
 )
 
 type ingredientSection struct {
@@ -46,17 +50,36 @@ func (router *Router) Setup() {
 	// Set up routing
 	fs := http.FileServer(http.Dir("assets"))
 	router.Mux.Handle("/assets/", http.StripPrefix("/assets/", fs))
-	router.Mux.HandleFunc("/read/{id}", router.readRecipeHandler)
+	// TODO: remove this demo logic
+	router.Mux.Handle("/read/{id}", authMiddleware(http.HandlerFunc(router.readRecipeHandler)))
 	router.Mux.HandleFunc("GET /create", router.createGetRecipeHandler)
 	router.Mux.HandleFunc("POST /create", router.createPostRecipeHandler)
 	router.Mux.HandleFunc("GET /edit/{id}", router.editGetRecipeHandler)
 	router.Mux.HandleFunc("POST /edit/{id}", router.editPostRecipeHandler)
 	router.Mux.HandleFunc("GET /search", router.searchGetRecipeHandler)
 	router.Mux.HandleFunc("GET /add", router.addGetRecipeHandler)
+	router.Mux.HandleFunc("GET /login", router.loginGetRecipeHandler)
+	router.Mux.HandleFunc("POST /login", router.loginPostRecipeHandler)
+	router.Mux.HandleFunc("GET /signup", router.signupGetRecipeHandler)
+	router.Mux.HandleFunc("POST /signup", router.signupPostRecipeHandler)
 	readTpl = template.Must(template.ParseFiles("templates/base.tmpl", "templates/header.tmpl", "templates/read.tmpl"))
 	editTpl = template.Must(template.ParseFiles("templates/base.tmpl", "templates/header.tmpl", "templates/edit.tmpl"))
 	searchTpl = template.Must(template.ParseFiles("templates/base.tmpl", "templates/header.tmpl", "templates/search.tmpl"))
 	addTpl = template.Must(template.ParseFiles("templates/base.tmpl", "templates/header.tmpl", "templates/add.tmpl"))
+	loginTpl = template.Must(template.ParseFiles("templates/base.tmpl", "templates/header.tmpl", "templates/login.tmpl"))
+	signupTpl = template.Must(template.ParseFiles("templates/base.tmpl", "templates/header.tmpl", "templates/signup.tmpl"))
+}
+
+func addUserId(ctx context.Context, id int) context.Context {
+	return context.WithValue(ctx, "userId", id)
+}
+
+func retrieveId(ctx context.Context) (int, error) {
+	if val := ctx.Value("userId"); val == nil {
+		return 0, errors.New("Failed to retrieve id from context")
+	} else {
+		return val.(int), nil
+	}
 }
 
 func parseID(r *http.Request) (internal.ID, error) {
@@ -139,9 +162,23 @@ func (router *Router) readRecipeHandler(w http.ResponseWriter, r *http.Request) 
 		StepSections       []stepSection
 	}
 
+	// TODO: remove this demo logic
+	userId, err := retrieveId(r.Context())
+	if err != nil {
+		log.Printf("Failed to get userId")
+		http.Redirect(w, r, "/login", http.StatusInternalServerError)
+		return
+	}
+
 	id, err := parseID(r)
 	if err != nil {
 		http.Redirect(w, r, "/search", http.StatusNotFound)
+		return
+	}
+
+	// TODO: remove this demo logic
+	if userId < int(id) {
+		http.Redirect(w, r, "/login", http.StatusForbidden)
 		return
 	}
 
@@ -302,24 +339,24 @@ func (router *Router) searchGetRecipeHandler(w http.ResponseWriter, r *http.Requ
 	}
 
 	type searchFormData struct {
-		RecipeName string
-		Author string
-		Uploader string
-		PrepTime string
-		TotalTime string
-		Yield string
+		RecipeName      string
+		Author          string
+		Uploader        string
+		PrepTime        string
+		TotalTime       string
+		Yield           string
 		IngredientCount string
-		Ingredients []string
+		Ingredients     []string
 	}
 
 	// Pull the data from the form
 	formData := searchFormData{
-		RecipeName: r.FormValue("recipe-name"),
-		Author: r.FormValue("author"),
-		Uploader: r.FormValue("uploader"),
-		PrepTime: r.FormValue("prep-time"),
-		TotalTime: r.FormValue("total-time"),
-		Yield: r.FormValue("yield"),
+		RecipeName:      r.FormValue("recipe-name"),
+		Author:          r.FormValue("author"),
+		Uploader:        r.FormValue("uploader"),
+		PrepTime:        r.FormValue("prep-time"),
+		TotalTime:       r.FormValue("total-time"),
+		Yield:           r.FormValue("yield"),
 		IngredientCount: r.FormValue("ingredient-count"),
 	}
 
@@ -371,12 +408,12 @@ func (router *Router) searchGetRecipeHandler(w http.ResponseWriter, r *http.Requ
 
 	type data struct {
 		FormData searchFormData
-		Results []internal.SearchResult
+		Results  []internal.SearchResult
 	}
 
 	pageData := data{
 		FormData: formData,
-		Results: searchResults,
+		Results:  searchResults,
 	}
 
 	if err := searchTpl.Execute(w, pageData); err != nil {
@@ -429,4 +466,58 @@ func (router *Router) createPostRecipeHandler(w http.ResponseWriter, r *http.Req
 
 	// Reroute to the new read page for the created index
 	http.Redirect(w, r, fmt.Sprintf("/read/%d", id), http.StatusSeeOther)
+}
+
+func (router *Router) signupGetRecipeHandler(w http.ResponseWriter, r *http.Request) {
+	if err := signupTpl.Execute(w, nil); err != nil {
+		log.Printf("Failed to execute signupGet %v\n", err)
+		http.Error(w, "server error", http.StatusInternalServerError)
+	}
+}
+
+func (router *Router) signupPostRecipeHandler(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		log.Printf("Failed to parse form: %v", err)
+		return
+	}
+
+	if err := auth.CreateUser(r.FormValue("username"), r.FormValue("password")); err != nil {
+		http.Error(w, "Invalid username or password", http.StatusBadRequest)
+		return
+	}
+
+	http.Redirect(w, r, "/login", http.StatusSeeOther)
+}
+
+func authMiddleware(next http.HandlerFunc) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+		if id, err := auth.GetUserId(ctx); err != nil {
+			http.Redirect(w, r, "/login", http.StatusUnauthorized)
+			return
+		} else {
+			next.ServeHTTP(w, r.WithContext(addUserId(ctx, id)))
+		}
+	})
+}
+
+func (router *Router) loginGetRecipeHandler(w http.ResponseWriter, r *http.Request) {
+	if err := loginTpl.Execute(w, nil); err != nil {
+		log.Printf("Failed to execute loginGet %v\n", err)
+		http.Error(w, "server error", http.StatusInternalServerError)
+	}
+}
+
+func (router *Router) loginPostRecipeHandler(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		log.Printf("Failed to parse form: %v", err)
+		return
+	}
+
+	if err := auth.Authenticate(r.FormValue("username"), r.FormValue("password"), r.Context()); err != nil {
+		http.Error(w, "Invalid username or password", http.StatusBadRequest)
+		return
+	}
+
+	http.Redirect(w, r, "/search", http.StatusSeeOther)
 }

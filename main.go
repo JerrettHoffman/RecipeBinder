@@ -1,6 +1,7 @@
 package main
 
 import (
+	"RecipeBinder/auth"
 	"RecipeBinder/router"
 	"log"
 	"net/http"
@@ -12,17 +13,19 @@ func main() {
 	r := router.Router{}
 	r.Setup()
 
+	auth.Setup()
+
 	// Initialize the server
 	goServer := &http.Server{
 		Addr:                         ":8080",
-		Handler:                      r.Mux,
+		Handler:                      auth.SessionMiddleware(r.Mux),
 		DisableGeneralOptionsHandler: false,
 		ReadTimeout:                  10 * time.Second,
 		ReadHeaderTimeout:            10 * time.Second,
 		WriteTimeout:                 10 * time.Second,
 		IdleTimeout:                  0,
 		MaxHeaderBytes:               1 << 20,
-		ErrorLog: &log.Logger{},
+		ErrorLog:                     &log.Logger{},
 	}
 
 	// Kickoff server
