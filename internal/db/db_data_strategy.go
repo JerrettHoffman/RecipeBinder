@@ -4,7 +4,21 @@ import "RecipeBinder/internal"
 
 type DbRecipeDataStrategy struct{}
 
+// We assume that the username in RecipeData uploader field comes from an already created user
 func (d DbRecipeDataStrategy) CreateRecipe(recipe internal.RecipeData) (internal.ID, error) {
+	// order matters since some tables use IDs from earlier tables as foriegn keys
+	userId, err := readUserId(recipe.Uploader)
+	if err != nil {
+		return -1, err
+	}
+
+	authorId, err := insertAuthor(DbAuthor{
+		Id:   "",
+		Name: recipe.Author,
+	})
+	if err != nil {
+		return -1, err
+	}
 
 	return 0, nil
 }
