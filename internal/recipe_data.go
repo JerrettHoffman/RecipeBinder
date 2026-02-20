@@ -19,6 +19,6 @@ type RecipeData struct {
 type RecipeDataStrategy interface {
 	ReadRecipe(recipeId ID) (RecipeData, error)
 	UpdateRecipe(recipe RecipeData, recipeId ID) error
-	CreateRecipe(recipe RecipeData) (ID, error)
+	CreateRecipe(recipe RecipeData, uploaderId ID) (ID, error)
 	DeleteRecipe(recipeId ID) error
 }

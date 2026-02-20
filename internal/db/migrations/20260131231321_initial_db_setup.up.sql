@@ -7,8 +7,8 @@ CREATE TABLE IF NOT EXISTS authors (
 
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
-    username VARCHAR(255) NOT NULL,
-    display_name VARCHAR(255) NOT NULL
+    username VARCHAR(50) NOT NULL,
+    hashed_password VARCHAR(100) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS recipes (
