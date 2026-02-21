@@ -1,4 +1,4 @@
-package internal
+package db
 
 import "RecipeBinder/internal"
 
@@ -25,12 +25,12 @@ func insertAuthor(author DbAuthor) (internal.ID, error) {
 func insertUser(user DbUser) (internal.ID, error) {
 	q := InsertQuery{
 		query: `
-		INSERT INTO users (username, display_name)
-		VALUES (@userName, @displayName)
+		INSERT INTO users (username, hashed_password)
+		VALUES (@userName, @hashedPassword)
 		RETURNING id`,
 		args: DbInsertArgs{
-			"userName":    user.Username,
-			"displayName": user.DisplayName,
+			"userName":       user.Username,
+			"hashedPassword": user.HashedPassword,
 		},
 	}
 	id, err := q.DbInsertReturningId()

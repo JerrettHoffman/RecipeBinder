@@ -34,10 +34,10 @@ func (t TestRecipeDataStrategy) UpdateRecipe(recipe RecipeData, recipeId ID) err
 	return nil
 }
 
-func (t TestRecipeDataStrategy) CreateRecipe(recipe RecipeData) (ID, error) {
+func (t TestRecipeDataStrategy) CreateRecipe(recipe RecipeData, uploaderId ID) (ID, error) {
 	return 0, nil
 }
 
-func (t TestRecipeDataStrategy) DeleteRecipe(recipeID ID) error {
+func (t TestRecipeDataStrategy) DeleteRecipe(recipeID ID, uploaderId ID) error {
 	return nil
 }

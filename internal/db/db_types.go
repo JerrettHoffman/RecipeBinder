@@ -1,4 +1,4 @@
-package internal
+package db
 
 type DbIngredient struct {
 	Id   string
@@ -11,9 +11,9 @@ type DbAuthor struct {
 }
 
 type DbUser struct {
-	Id          string
-	Username    string
-	DisplayName string
+	Id             string
+	Username       string
+	HashedPassword string
 }
 
 type DbRecipe struct {
