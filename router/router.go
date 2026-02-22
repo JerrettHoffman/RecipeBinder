@@ -302,24 +302,24 @@ func (router *Router) searchGetRecipeHandler(w http.ResponseWriter, r *http.Requ
 	}
 
 	type searchFormData struct {
-		RecipeName string
-		Author string
-		Uploader string
-		PrepTime string
-		TotalTime string
-		Yield string
+		RecipeName      string
+		Author          string
+		Uploader        string
+		PrepTime        string
+		TotalTime       string
+		Yield           string
 		IngredientCount string
-		Ingredients []string
+		Ingredients     []string
 	}
 
 	// Pull the data from the form
 	formData := searchFormData{
-		RecipeName: r.FormValue("recipe-name"),
-		Author: r.FormValue("author"),
-		Uploader: r.FormValue("uploader"),
-		PrepTime: r.FormValue("prep-time"),
-		TotalTime: r.FormValue("total-time"),
-		Yield: r.FormValue("yield"),
+		RecipeName:      r.FormValue("recipe-name"),
+		Author:          r.FormValue("author"),
+		Uploader:        r.FormValue("uploader"),
+		PrepTime:        r.FormValue("prep-time"),
+		TotalTime:       r.FormValue("total-time"),
+		Yield:           r.FormValue("yield"),
 		IngredientCount: r.FormValue("ingredient-count"),
 	}
 
@@ -371,12 +371,12 @@ func (router *Router) searchGetRecipeHandler(w http.ResponseWriter, r *http.Requ
 
 	type data struct {
 		FormData searchFormData
-		Results []internal.SearchResult
+		Results  []internal.SearchResult
 	}
 
 	pageData := data{
 		FormData: formData,
-		Results: searchResults,
+		Results:  searchResults,
 	}
 
 	if err := searchTpl.Execute(w, pageData); err != nil {
@@ -421,7 +421,7 @@ func (router *Router) createPostRecipeHandler(w http.ResponseWriter, r *http.Req
 
 	// Send to DB
 	builder := internal.TestRecipeDataStrategy{}
-	id, err := builder.CreateRecipe(dbData)
+	id, err := builder.CreateRecipe(dbData, internal.ID(1))
 	if err != nil {
 		http.Error(w, "Could not create recipe", http.StatusInternalServerError)
 		return

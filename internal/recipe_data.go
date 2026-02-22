@@ -2,7 +2,7 @@ package internal
 
 import "time"
 
-type ID int
+type ID = int
 
 type RecipeData struct {
 	RecipeName  string
