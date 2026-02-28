@@ -1,7 +1,7 @@
 package router
 
 import (
-	"RecipeBinder/auth"
+	"RecipeBinder/internal/auth"
 	"RecipeBinder/internal"
 	"RecipeBinder/internal/db"
 	// TODO: remove demo logic

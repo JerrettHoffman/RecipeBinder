@@ -1,9 +1,9 @@
 package main
 
 import (
-	"RecipeBinder/auth"
+	"RecipeBinder/internal/auth"
 	db "RecipeBinder/internal/db/dbtest"
-	"RecipeBinder/router"
+	"RecipeBinder/internal/router"
 
 	"context"
 	"log"
