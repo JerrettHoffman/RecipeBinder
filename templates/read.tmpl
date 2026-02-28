@@ -58,10 +58,9 @@
 		{{end}}
 	{{end}}
 	</main>
-	<button class="open-ingredient-popup" id="open-ingredient-popup">Show Ingredients</button>
+	<button class="open-ingredient-popup" id="open-ingredient-popup" command="show-modal" commandfor="ingredient-popup">Show Ingredients</button>
 	<dialog class="ingredient-popup" id="ingredient-popup" closedby="any">
-	<button id="close-ingredient-popup" autofocus>Close Ingredients</button>
+	<button id="close-ingredient-popup" command="close" commandfor="ingredient-popup" autofocus>Close Ingredients</button>
 	{{template "ingredientsList" .}}
 	</dialog>
-	<script type="text/javascript" src="/assets/js/read-page.js"></script>
 {{end}}
