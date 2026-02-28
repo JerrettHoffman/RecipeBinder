@@ -115,7 +115,7 @@ func parseID(r *http.Request) (internal.ID, error) {
 
 	if idStr != "" {
 		if parsedId, err := strconv.Atoi(idStr); err == nil {
-			return internal.ID(parsedId), nil
+			return parsedId, nil
 		} else {
 			log.Printf("Failed to parse id %v\n", err)
 			return -1, err
@@ -564,7 +564,7 @@ func (router *Router) createPostRecipeHandler(w http.ResponseWriter, r *http.Req
 
 	// Send to DB
 	builder := internal.TestRecipeDataStrategy{}
-	id, err := builder.CreateRecipe(dbData, internal.ID(userData.Id))
+	id, err := builder.CreateRecipe(dbData, userData.Id)
 	if err != nil {
 		http.Error(w, "Could not create recipe", http.StatusInternalServerError)
 		return

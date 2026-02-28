@@ -22,7 +22,7 @@ func (mock *MockUserAuth) ReadAuthUser(userName string) (internal.UserAuthData, 
 		return internal.UserAuthData{}, errors.New("User not found")
 	} else {
 		return internal.UserAuthData{
-			Id:             internal.ID(data.id),
+			Id:             data.id,
 			UserName:       userName,
 			HashedPassword: data.hashedPassword,
 		}, nil
