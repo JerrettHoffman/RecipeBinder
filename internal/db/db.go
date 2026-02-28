@@ -19,7 +19,7 @@ type postgres struct {
 	db *pgxpool.Pool
 }
 
-type DbInsertArgs pgx.NamedArgs
+type dbInsertArgs = pgx.NamedArgs
 
 var (
 	postgresInstance *postgres
@@ -46,15 +46,15 @@ func newPostgres(context context.Context, connString string) (*postgres, error) 
 // ex 'INSERT INTO users (name) VALUES (@userName)'
 //
 //	{"userName": "John Doe"}
-type InsertQuery struct {
+type dbQuery struct {
 	query string
-	args  DbInsertArgs
+	args  dbInsertArgs
 }
 
-// Using Query() here rather than Exec() since we need to return the id of the newly created row.
+// Using Query() here rather than Exec() since we need to return the id of the created/found single row
 // Ensure input query string has a sql returning command
-func (q InsertQuery) DbInsertReturningId() (internal.ID, error) {
-	postgres, err := newPostgres(context.Background(), os.Getenv("DB_URL"))
+func (q dbQuery) dbQuerySingleRowReturningId() (internal.ID, error) {
+	postgres, err := newPostgres(context.Background(), os.Getenv("DATABASE_URL"))
 	if err != nil {
 		return 0, fmt.Errorf("Table connection error: %w", err)
 	}
@@ -70,7 +70,8 @@ func (q InsertQuery) DbInsertReturningId() (internal.ID, error) {
 	return id, nil
 }
 
-func (q InsertQuery) DbInsert() error {
+// Use this function to primarily inser rows in the db when you do not need the ID returned
+func (q dbQuery) dbExec() error {
 	postgres, err := newPostgres(context.Background(), os.Getenv("DB_URL"))
 	if err != nil {
 		return fmt.Errorf("Table connection error: %w", err)

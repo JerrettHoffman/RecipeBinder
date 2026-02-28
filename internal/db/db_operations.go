@@ -3,17 +3,17 @@ package db
 import "RecipeBinder/internal"
 
 func insertAuthor(author DbAuthor) (internal.ID, error) {
-	q := InsertQuery{
+	q := dbQuery{
 		query: `
 		INSERT INTO authors (name)
-		VALUES (@authorName)
+		VALUES (@name)
 		RETURNING id`,
-		args: DbInsertArgs{
-			"authorName": author.Name,
+		args: dbInsertArgs{
+			"name": author.Name,
 		},
 	}
 
-	id, err := q.DbInsertReturningId()
+	id, err := q.dbQuerySingleRowReturningId()
 
 	if err != nil {
 		return -1, err
@@ -23,17 +23,17 @@ func insertAuthor(author DbAuthor) (internal.ID, error) {
 }
 
 func insertUser(user DbUser) (internal.ID, error) {
-	q := InsertQuery{
+	q := dbQuery{
 		query: `
 		INSERT INTO users (username, hashed_password)
 		VALUES (@userName, @hashedPassword)
 		RETURNING id`,
-		args: DbInsertArgs{
+		args: dbInsertArgs{
 			"userName":       user.Username,
 			"hashedPassword": user.HashedPassword,
 		},
 	}
-	id, err := q.DbInsertReturningId()
+	id, err := q.dbQuerySingleRowReturningId()
 
 	if err != nil {
 		return -1, err
@@ -43,12 +43,12 @@ func insertUser(user DbUser) (internal.ID, error) {
 }
 
 func insertRecipe(recipe DbRecipe) (internal.ID, error) {
-	q := InsertQuery{
+	q := dbQuery{
 		query: `
 		INSERT INTO recipes (name, author_id, uploader_id, prep_time, total_time, steps, ingredient_text, yeild)
 		VALUES (@recipeName, @authorId, @uploaderId, @prepTime, @totalTime, @steps, @ingredientText, @yeild)
 		RETURNING id`,
-		args: DbInsertArgs{
+		args: dbInsertArgs{
 			"recipeName":     recipe.Name,
 			"authorId":       recipe.AuthorId,
 			"uploaderId":     recipe.UploaderId,
@@ -59,7 +59,7 @@ func insertRecipe(recipe DbRecipe) (internal.ID, error) {
 			"yeild":          recipe.Yeild,
 		},
 	}
-	id, err := q.DbInsertReturningId()
+	id, err := q.dbQuerySingleRowReturningId()
 
 	if err != nil {
 		return -1, err
@@ -69,16 +69,16 @@ func insertRecipe(recipe DbRecipe) (internal.ID, error) {
 }
 
 func insertIngredient(ingredient DbIngredient) (internal.ID, error) {
-	q := InsertQuery{
+	q := dbQuery{
 		query: `
 		INSERT INTO ingredients (name)
 		VALUES (@ingredientName)
 		RETURNING id`,
-		args: DbInsertArgs{
+		args: dbInsertArgs{
 			"ingredientName": ingredient.Name,
 		},
 	}
-	id, err := q.DbInsertReturningId()
+	id, err := q.dbQuerySingleRowReturningId()
 
 	if err != nil {
 		return -1, err
@@ -88,20 +88,38 @@ func insertIngredient(ingredient DbIngredient) (internal.ID, error) {
 }
 
 func insertRecipeIngredient(recipeIngredient DbRecipeIngredient) error {
-	q := InsertQuery{
+	q := dbQuery{
 		query: `
 		INSERT INTO recipe_ingredients (recipe_id, ingredient_id)
 		VALUES (@recipeId, @ingredientId)`,
-		args: DbInsertArgs{
+		args: dbInsertArgs{
 			"recipeId":     recipeIngredient.RecipeId,
 			"ingredientId": recipeIngredient.IngredientId,
 		},
 	}
-	err := q.DbInsert()
+	err := q.dbExec()
 
 	if err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func findAuthor(authorName string) (internal.ID, error) {
+	q := dbQuery{
+		query: `
+		SELECT id FROM authors
+		WHERE name=@name`,
+		args: dbInsertArgs{
+			"name": authorName,
+		},
+	}
+
+	id, err := q.dbQuerySingleRowReturningId()
+	if err != nil {
+		return -1, nil
+	}
+
+	return id, nil
 }
