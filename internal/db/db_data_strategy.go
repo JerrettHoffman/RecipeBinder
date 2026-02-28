@@ -9,7 +9,7 @@ func (d DbRecipeDataStrategy) CreateRecipe(recipe internal.RecipeData, userId in
 	// order matters since some tables use IDs from earlier tables as foriegn keys
 
 	//check if author exists, otherwise create new one
-	authorId, err := insertAuthor(DbAuthor{
+	_, err := insertAuthor(DbAuthor{
 		Id:   "",
 		Name: recipe.Author,
 	})
@@ -43,6 +43,9 @@ type DbUserAuthDataStrategy struct{}
 func (d DbUserAuthDataStrategy) ReadAuthUser(userName string) (internal.UserAuthData, error) {
 	return internal.UserAuthData{}, nil
 }
-func (d DbUserAuthDataStrategy) CreateAuthUser(userName string) error {
+func (d DbUserAuthDataStrategy) CreateAuthUser(userName string, hashedPw string) error {
+	return nil
+}
+func (d DbUserAuthDataStrategy) UpdateAuthUser(currUserId internal.ID, newUser internal.UserAuthData) error {
 	return nil
 }

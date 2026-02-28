@@ -416,6 +416,14 @@ html {
 	background-color: var(--rp-gold);
 }
 
+a {
+	color: var(--rp-pine);
+}
+
+a:visited {
+	color: var(--rp-iris);
+}
+
 header {
 	display: flex;
 	justify-content: space-between;
@@ -460,6 +468,12 @@ main {
 	max-width: 60rem;
 	margin: auto;
 	padding-inline: 1rem;
+}
+
+.recipe-title-container{
+	display: flex;
+	align-items: center;
+	gap: 2rem;
 }
 
 .recipe-metadata-container {
@@ -589,10 +603,6 @@ input::file-selector-button:hover {
 	grid-template-columns: 1fr 1fr;
 	margin-top: 2rem;
 	justify-items: center;
-
-	a {
-		color: inherit;
-	}
 }
 
 .results-link-list {
@@ -606,7 +616,6 @@ input::file-selector-button:hover {
 		min-height: 2lh;
 
 		a {
-			color: inherit;
 			font-size: 1.2rem;
 		}
 	}

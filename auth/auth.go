@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"RecipeBinder/internal"
 	"context"
 	"errors"
 	"net/http"
@@ -11,51 +12,52 @@ import (
 )
 
 type UserData struct {
-	hashedPassword []byte
-	Id             int
+	Id   int
+	User string
 }
 
-var currentId = 1
-var userDatabase map[string]UserData
+const (
+	UninitialzedId = -1
+)
+
 var sessionManager *scs.SessionManager
 
 func Setup() {
 	sessionManager = scs.New()
 	sessionManager.Lifetime = 12 * time.Hour
-
-	userDatabase = make(map[string]UserData, 0)
-
-	currentId = 1
 }
 
-func CreateUser(name string, password string) error {
+func CreateUser(name string, password string, userDatabase internal.UserAuthDataStrategy) error {
 	if hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), 12); err != nil {
 		return err
 	} else {
-		userDatabase[name] = UserData{hashedPassword, currentId}
-		currentId++
-		return nil
+		return userDatabase.CreateAuthUser(name, string(hashedPassword))
 	}
 }
 
-func Authenticate(name string, password string, ctx context.Context) error {
-	// Hit the db
-	userData := userDatabase[name]
-
-	if err := bcrypt.CompareHashAndPassword(userData.hashedPassword, []byte(password)); err != nil {
+func Authenticate(name string, password string, ctx context.Context, userDatabase internal.UserAuthDataStrategy) error {
+	if userData, err := userDatabase.ReadAuthUser(name); err != nil {
 		return err
 	} else {
-		sessionManager.Put(ctx, "user", name)
-		sessionManager.Put(ctx, "id", userData.Id)
-		return nil
+		if err := bcrypt.CompareHashAndPassword([]byte(userData.HashedPassword), []byte(password)); err != nil {
+			return err
+		} else {
+			sessionManager.Put(ctx, "user", name)
+			sessionManager.Put(ctx, "userId", int(userData.Id))
+			return nil
+		}
 	}
 }
 
-func GetUserId(ctx context.Context) (int, error) {
-	if id := sessionManager.GetInt(ctx, "id"); id == 0 {
-		return 0, errors.New("Failed to parse Id")
+func GetUser(ctx context.Context) (UserData, error) {
+	if id := sessionManager.GetInt(ctx, "userId"); id == 0 {
+		return UserData{UninitialzedId, ""}, errors.New("Failed to parse userId")
 	} else {
-		return id, nil
+		if user := sessionManager.GetString(ctx, "user"); user == "" {
+			return UserData{UninitialzedId, ""}, errors.New("Failed to parse user")
+		} else {
+			return UserData{id, user}, nil
+		}
 	}
 }
 
