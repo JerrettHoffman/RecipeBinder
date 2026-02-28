@@ -1,14 +1,19 @@
 package main
 
 import (
+	"RecipeBinder/auth"
 	db "RecipeBinder/internal/db/dbtest"
 	"RecipeBinder/router"
-	"github.com/joho/godotenv"
+
+	"context"
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
 	"strings"
 	"time"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
@@ -17,7 +22,10 @@ func main() {
 		log.Fatalf("Error loading .env file: %v", envErr)
 	}
 
-	userArgs := strings.ToLower(os.Args[1])
+	userArgs := ""
+	if len(os.Args) > 1 {
+		userArgs = strings.ToLower(os.Args[1])
+	}
 
 	if userArgs == "dbtest" {
 		println("About to run dbtest")
@@ -30,10 +38,12 @@ func main() {
 		r := router.Router{}
 		r.Setup()
 
+		auth.Setup()
+
 		// Initialize the server
 		goServer := &http.Server{
 			Addr:                         ":8080",
-			Handler:                      r.Mux,
+			Handler:                      auth.SessionMiddleware(r.Handler),
 			DisableGeneralOptionsHandler: false,
 			ReadTimeout:                  10 * time.Second,
 			ReadHeaderTimeout:            10 * time.Second,
@@ -43,9 +53,29 @@ func main() {
 			ErrorLog:                     &log.Logger{},
 		}
 
+		// Setup listener for interrupt signal (run in goroutine)
+		idleConnsClosed := make(chan struct{})
+		go func() {
+			sigint := make(chan os.Signal, 1)
+			signal.Notify(sigint, os.Interrupt)
+			<-sigint
+
+			// We received an interrupt signal, shut down.
+			if err := goServer.Shutdown(context.Background()); err != nil {
+				// Error from closing listeners, or context timeout:
+				log.Printf("HTTP server Shutdown: %v", err)
+			}
+			close(idleConnsClosed)
+		}()
+
+		log.Print("Starting server...\n\n\nhttp://localhost:8080/search\n\n")
+
 		// Kickoff server
 		if err := goServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("ListenAndServe failed: %v", err)
 		}
+
+		<-idleConnsClosed
 	}
+
 }

@@ -14,7 +14,12 @@
 {{end}}
 
 {{define "content"}}
-	<h1>Recipe Name</h1>
+	<div class="recipe-title-container">
+		<h1>Recipe Name</h1>
+		{{if .CanEdit}}
+		<a href="/edit/{{.RecipeId}}">Edit</a>
+		{{end}}
+	</div>
 	<div class="recipe-metadata-container">
 		<div class="recipe-metadata">
 			<p><b>By:</b></p>

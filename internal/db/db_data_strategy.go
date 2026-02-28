@@ -75,6 +75,9 @@ type DbUserAuthDataStrategy struct{}
 func (d DbUserAuthDataStrategy) ReadAuthUser(userName string) (internal.UserAuthData, error) {
 	return internal.UserAuthData{}, nil
 }
-func (d DbUserAuthDataStrategy) CreateAuthUser(userName string) error {
+func (d DbUserAuthDataStrategy) CreateAuthUser(userName string, hashedPw string) error {
+	return nil
+}
+func (d DbUserAuthDataStrategy) UpdateAuthUser(currUserId internal.ID, newUser internal.UserAuthData) error {
 	return nil
 }
