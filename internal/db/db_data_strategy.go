@@ -37,8 +37,8 @@ func (d DbRecipeDataStrategy) CreateRecipe(recipe internal.RecipeData, userId in
 	newRecipeId, err := insertRecipe(DbRecipe{
 		Id:             "",
 		Name:           recipe.RecipeName,
-		AuthorId:       int(authorId),
-		UploaderId:     int(userId),
+		AuthorId:       authorId,
+		UploaderId:     userId,
 		PrepTime:       int(recipe.PrepTime),
 		TotalTime:      int(recipe.TotalTime),
 		Steps:          recipe.Steps,

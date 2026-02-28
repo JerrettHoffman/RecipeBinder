@@ -43,7 +43,7 @@ func Authenticate(name string, password string, ctx context.Context, userDatabas
 			return err
 		} else {
 			sessionManager.Put(ctx, "user", name)
-			sessionManager.Put(ctx, "userId", int(userData.Id))
+			sessionManager.Put(ctx, "userId", userData.Id)
 			return nil
 		}
 	}

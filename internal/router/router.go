@@ -248,7 +248,7 @@ func (router *Router) readRecipeHandler(w http.ResponseWriter, r *http.Request) 
 		ingredientSections,
 		recipeData.Image,
 		stepsSections,
-		int(recipeId),
+		recipeId,
 		canEdit,
 		basePageData{
 			sessionValid,
