@@ -605,6 +605,10 @@ textarea:user-invalid{
 	padding-block: 0.5rem;
 }
 
+.login-error {
+	color: var(--rp-love);
+}
+
 .password-show-container {
 	min-height: 44px;
 	min-width: 44px;

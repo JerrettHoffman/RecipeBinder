@@ -1,8 +1,8 @@
 package router
 
 import (
-	"RecipeBinder/internal/auth"
 	"RecipeBinder/internal"
+	"RecipeBinder/internal/auth"
 	"RecipeBinder/internal/db"
 	// TODO: remove demo logic
 	"RecipeBinder/internal/mock"
@@ -597,7 +597,19 @@ func (router *Router) signupPostRecipeHandler(w http.ResponseWriter, r *http.Req
 }
 
 func (router *Router) loginGetRecipeHandler(w http.ResponseWriter, r *http.Request) {
-	pageData := basePageData{hasValidSession(r)}
+	type data struct {
+		HasError bool
+		UserName string
+		basePageData
+	}
+
+	if err := r.ParseForm(); err != nil {
+		log.Printf("Failed to parse form: %v", err)
+		http.Error(w, "server error", http.StatusInternalServerError)
+		return
+	}
+
+	pageData := data{r.FormValue("error") == "true", r.FormValue("username"), basePageData{hasValidSession(r)}}
 	if err := loginTpl.Execute(w, pageData); err != nil {
 		log.Printf("Failed to execute loginGet %v\n", err)
 		http.Error(w, "server error", http.StatusInternalServerError)
@@ -610,8 +622,9 @@ func (router *Router) loginPostRecipeHandler(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	if err := auth.Authenticate(r.FormValue("username"), r.FormValue("password"), r.Context(), router.UserDatabase); err != nil {
-		http.Error(w, "Invalid username or password", http.StatusBadRequest)
+	userName := r.FormValue("username")
+	if err := auth.Authenticate(userName, r.FormValue("password"), r.Context(), router.UserDatabase); err != nil {
+		http.Redirect(w, r, fmt.Sprintf("/login?error=true&username=%s", userName), http.StatusFound)
 		return
 	}
 

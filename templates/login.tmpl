@@ -1,9 +1,12 @@
 {{define "content"}}
 	<h1>Login</h1>
 	<form class="login-form" action="/login" method="post">
+		{{if .HasError}}
+		<span class="login-error" id="login-error">Error: Username or password invalid</span>
+		{{end}}
 		<div class="form-group">
 			<label for="username">Username:</label>
-			<input type="text" id="username" name="username" required>
+			<input type="text" id="username" name="username" {{if .UserName}}value="{{.UserName}}"{{end}} required>
 		</div>
 		<div class="form-group">
 			<label for="password">Password:</label>
