@@ -472,7 +472,8 @@ main {
 
 .signup-link {
 	display: block;
-	text-align: end;
+	width: fit-content;
+	margin-left: auto;
 }
 
 .recipe-title-container{
