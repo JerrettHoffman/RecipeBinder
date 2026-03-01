@@ -1,7 +1,10 @@
-.PHONY: build
-build:
-	go build -o "RecipeBinder.exe" RecipeBinder
+.PHONY: httpServer
+httpServer:
+	go build -o "RecipeBinder.exe" RecipeBinder/cmd/httpServer
 
 .PHONY: run
-run: build
+run: httpServer
 	./RecipeBinder.exe
+
+.PHONY: all
+all: httpServer
