@@ -4,6 +4,9 @@ import (
 	"RecipeBinder/internal"
 	"RecipeBinder/internal/auth"
 	"RecipeBinder/internal/db"
+	"os"
+	"path/filepath"
+
 	// TODO: remove demo logic
 	"RecipeBinder/internal/mock"
 
@@ -23,6 +26,7 @@ const (
 	maxIngredientCapacity = 100
 	headerMarkup          = "## "
 	bulletMarkup          = "* "
+	userDataContext       = "userData"
 )
 
 var (
@@ -56,12 +60,12 @@ type Router struct {
 
 // Adds user data to the context
 func storeUserData(ctx context.Context, userData auth.UserData) context.Context {
-	return context.WithValue(ctx, "userData", userData)
+	return context.WithValue(ctx, userDataContext, userData)
 }
 
 // Pulls user data from the provided context
 func retrieveUserData(ctx context.Context) (auth.UserData, error) {
-	if val := ctx.Value("userData"); val == nil {
+	if val := ctx.Value(userDataContext); val == nil {
 		return auth.UserData{Id: auth.UninitialzedId, User: ""}, errors.New("Failed to retrieve userData from context")
 	} else {
 		return val.(auth.UserData), nil
@@ -77,6 +81,7 @@ func userSessionMiddleware(next http.Handler) http.Handler {
 	})
 }
 
+// Setup mux and routes, compile templates, initialize db
 func (router *Router) Setup() {
 	router.Mux = http.NewServeMux()
 
@@ -97,12 +102,17 @@ func (router *Router) Setup() {
 
 	router.Handler = userSessionMiddleware(router.Mux)
 
-	readTpl = template.Must(template.ParseFiles("templates/base.tmpl", "templates/header.tmpl", "templates/read.tmpl"))
-	editTpl = template.Must(template.ParseFiles("templates/base.tmpl", "templates/header.tmpl", "templates/edit.tmpl"))
-	searchTpl = template.Must(template.ParseFiles("templates/base.tmpl", "templates/header.tmpl", "templates/search.tmpl"))
-	addTpl = template.Must(template.ParseFiles("templates/base.tmpl", "templates/header.tmpl", "templates/add.tmpl"))
-	loginTpl = template.Must(template.ParseFiles("templates/base.tmpl", "templates/header.tmpl", "templates/login.tmpl"))
-	signupTpl = template.Must(template.ParseFiles("templates/base.tmpl", "templates/header.tmpl", "templates/signup.tmpl"))
+	templateDirectory := os.Getenv("TEMPLATE_DIRECTORY")
+	makeAbsolute := func(relativePath string) string {
+		return filepath.Join(templateDirectory, relativePath)
+	}
+
+	readTpl = template.Must(template.ParseFiles(makeAbsolute("base.tmpl"), makeAbsolute("header.tmpl"), makeAbsolute("read.tmpl")))
+	editTpl = template.Must(template.ParseFiles(makeAbsolute("base.tmpl"), makeAbsolute("header.tmpl"), makeAbsolute("edit.tmpl")))
+	searchTpl = template.Must(template.ParseFiles(makeAbsolute("base.tmpl"), makeAbsolute("header.tmpl"), makeAbsolute("search.tmpl")))
+	addTpl = template.Must(template.ParseFiles(makeAbsolute("base.tmpl"), makeAbsolute("header.tmpl"), makeAbsolute("add.tmpl")))
+	loginTpl = template.Must(template.ParseFiles(makeAbsolute("base.tmpl"), makeAbsolute("header.tmpl"), makeAbsolute("login.tmpl")))
+	signupTpl = template.Must(template.ParseFiles(makeAbsolute("base.tmpl"), makeAbsolute("header.tmpl"), makeAbsolute("signup.tmpl")))
 
 	// Setup db
 	router.UserDatabase = db.DbUserAuthDataStrategy{}
@@ -110,6 +120,7 @@ func (router *Router) Setup() {
 	router.UserDatabase = &mock.MockUserAuth{}
 }
 
+// Pulls the "id" value from the path wildcard
 func parseID(r *http.Request) (internal.ID, error) {
 	idStr := r.PathValue("id")
 
@@ -125,6 +136,7 @@ func parseID(r *http.Request) (internal.ID, error) {
 	return -1, errors.New("Request id was empty")
 }
 
+// Determines if there is a valid session in the request context
 func hasValidSession(r *http.Request) bool {
 	userData, err := retrieveUserData(r.Context())
 	if err != nil {
@@ -225,6 +237,7 @@ func (router *Router) readRecipeHandler(w http.ResponseWriter, r *http.Request) 
 
 	stepsSections := formatStepSections(recipeData.Steps)
 
+	// TODO: Refactor this session logic
 	canEdit := false
 	sessionValid := false
 	userData, err := retrieveUserData(r.Context())
@@ -282,6 +295,7 @@ func (router *Router) editGetRecipeHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
+	// TODO: Refactor this session logic
 	userData, err := retrieveUserData(r.Context())
 	if err != nil {
 		log.Printf("Failed to get userData %v", err)
@@ -322,6 +336,7 @@ func (router *Router) editGetRecipeHandler(w http.ResponseWriter, r *http.Reques
 	}
 }
 
+// Returns a recipe data struct with values pulled from the http request
 func fillDataFromForm(r *http.Request) (internal.RecipeData, error) {
 	var err error
 
@@ -375,6 +390,7 @@ func (router *Router) editPostRecipeHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
+	// TODO: Refactor this session logic
 	userData, err := retrieveUserData(r.Context())
 	if err != nil {
 		log.Printf("Failed to get userData %v", err)
@@ -386,6 +402,7 @@ func (router *Router) editPostRecipeHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
+	// TODO: What to do with invald form data?
 	dbData, err := fillDataFromForm(r)
 	if err != nil {
 		http.Error(w, "Invalid form data", http.StatusBadRequest)
@@ -525,6 +542,7 @@ func (router *Router) createGetRecipeHandler(w http.ResponseWriter, r *http.Requ
 		},
 	}
 
+	// TODO: Refactor this session logic
 	userData, err := retrieveUserData(r.Context())
 	if err != nil {
 		log.Printf("Failed to get userData %v", err)
@@ -551,6 +569,7 @@ func (router *Router) createPostRecipeHandler(w http.ResponseWriter, r *http.Req
 		return
 	}
 
+	// TODO: Refactor this session logic
 	userData, err := retrieveUserData(r.Context())
 	if err != nil {
 		log.Printf("Failed to get userData %v", err)
