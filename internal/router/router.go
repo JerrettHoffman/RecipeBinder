@@ -87,6 +87,7 @@ func (router *Router) Setup() {
 
 	// Set up routing
 	fs := http.FileServer(http.Dir("assets"))
+	router.Mux.HandleFunc("/", router.searchGetRecipeHandler)
 	router.Mux.Handle("/assets/", http.StripPrefix("/assets/", fs))
 	router.Mux.HandleFunc("/read/{id}", router.readRecipeHandler)
 	router.Mux.HandleFunc("GET /create", router.createGetRecipeHandler)
