@@ -279,7 +279,6 @@ type editTemplateData struct {
 	SubmitURL   string
 	RecipeName  string
 	Author      string
-	Uploader    string
 	PrepTime    time.Duration
 	TotalTime   time.Duration
 	Yield       string
@@ -321,7 +320,6 @@ func (router *Router) editGetRecipeHandler(w http.ResponseWriter, r *http.Reques
 		SubmitURL:    fmt.Sprintf("/edit/%d", recipeId),
 		RecipeName:   recipeData.RecipeName,
 		Author:       recipeData.Author,
-		Uploader:     recipeData.Uploader,
 		PrepTime:     recipeData.PrepTime,
 		TotalTime:    recipeData.TotalTime,
 		Yield:        recipeData.Yield,
@@ -338,6 +336,7 @@ func (router *Router) editGetRecipeHandler(w http.ResponseWriter, r *http.Reques
 }
 
 // Returns a recipe data struct with values pulled from the http request
+// Note: this does not look for or fill the uploader field
 func fillDataFromForm(r *http.Request) (internal.RecipeData, error) {
 	var err error
 
@@ -531,7 +530,6 @@ func (router *Router) createGetRecipeHandler(w http.ResponseWriter, r *http.Requ
 		SubmitURL:   "/create",
 		RecipeName:  "",
 		Author:      "",
-		Uploader:    "",
 		PrepTime:    time.Hour + time.Minute,
 		TotalTime:   time.Hour + time.Minute,
 		Yield:       "",
@@ -554,8 +552,6 @@ func (router *Router) createGetRecipeHandler(w http.ResponseWriter, r *http.Requ
 		http.Redirect(w, r, "/login", http.StatusFound)
 		return
 	}
-
-	data.Uploader = userData.User
 
 	if err := editTpl.Execute(w, data); err != nil {
 		log.Printf("Failed to execute createGet %v\n", err)
@@ -581,6 +577,8 @@ func (router *Router) createPostRecipeHandler(w http.ResponseWriter, r *http.Req
 		http.Redirect(w, r, "/login", http.StatusFound)
 		return
 	}
+
+	dbData.Uploader = userData.User
 
 	// Send to DB
 	builder := internal.TestRecipeDataStrategy{}
