@@ -14,12 +14,12 @@
 				<input type="text" id="uploader" name="uploader" value="{{.Uploader}}" readonly>
 			</div>
 			<div class="form-group">
-				<label for="prep-time">Prep time:</label>
-				<input type="text" id="prep-time" name="prep-time" value="{{.PrepTime}}" required>
+				<label for="prep-time">Prep time:  <span class="form-error-message">Error format: 00h00m00s</span></label>
+				<input type="text" id="prep-time" name="prep-time" value="{{.PrepTime}}" pattern="(\d+h)?(\d+m)?(\d+s)?">
 			</div>
 			<div class="form-group">
-				<label for="total-time">Total time:</label>
-				<input type="text" id="total-time" name="total-time" value="{{.TotalTime}}" required>
+				<label for="total-time">Total time:  <span class="form-error-message">Error format: 00h00m00s</span></label>
+				<input type="text" id="total-time" name="total-time" value="{{.TotalTime}}" pattern="(\d+h)?(\d+m)?(\d+s)?">
 			</div>
 			<div class="form-group">
 				<label for="yield">Yield:</label>
@@ -28,7 +28,7 @@
 		</div>
 		<div class="textarea-group">
 			<label for="ingredients">Ingredients:</label>
-			<span class="ingredient-error" id="ingredient-error">Error (Invalid Formatting): Lines must begin with "## " (denoting a section header) or "* " (denoting an ingredient)</span>
+			<span class="form-error-message" id="ingredient-error">Error (Invalid Formatting): Lines must begin with "## " (denoting a section header) or "* " (denoting an ingredient)</span>
 			<textarea class="ingredient-area" id="ingredients" name="ingredients" required>{{.Ingredients}}</textarea>
 			<script type="text/javascript" src="/assets/js/ingredient-area-validation.js"></script>
 		</div>

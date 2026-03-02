@@ -572,13 +572,13 @@ textarea:user-invalid{
 	display: grid;
 }
 
-.ingredient-error {
+.form-error-message {
 	visibility: hidden;
 	color: var(--rp-love);
 }
 
-.ingredient-error:has(+ .ingredient-area:user-invalid) {
-
+.textarea-group:has(:user-invalid) .form-error-message,
+.form-group:has(:user-invalid) .form-error-message {
 	visibility: visible;
 }
 
