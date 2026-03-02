@@ -255,12 +255,7 @@ func (router *Router) readRecipeHandler(w http.ResponseWriter, r *http.Request) 
 	// TODO: Refactor this session logic
 	canEdit := false
 	sessionValid := false
-	userData, err := retrieveUserData(r.Context())
-	if err != nil {
-		log.Printf("Failed to get userData %v", err)
-	} else if userData.Id == auth.UninitialzedId {
-		log.Printf("Invalid user id")
-	} else {
+	if userData, err := retrieveUserData(r.Context()); err == nil {
 		// TODO: remove demo logic
 		canEdit = userData.User == recipeData.Uploader
 		sessionValid = true
