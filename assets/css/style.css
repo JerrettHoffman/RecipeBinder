@@ -410,6 +410,7 @@ template {
 html {
 	background-color: var(--rp-base);
 	color: var(--rp-text);
+	scrollbar-gutter: stable both-edges;
 }
 
 ::selection {
