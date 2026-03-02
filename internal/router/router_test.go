@@ -332,6 +332,30 @@ func Test_formatIngredientSections(t *testing.T) {
 	}
 }
 
+func Test_formatDuration(t *testing.T) {
+	tests := []struct {
+		name string // description of this test case
+		// Named input parameters for target function.
+		duration time.Duration
+		want     string
+	}{
+		{"Test hours only", time.Hour, "1h"},
+		{"Test minutes only", time.Minute, "1m"},
+		{"Test hours and minutes", time.Hour + time.Minute, "1h 1m"},
+		{"Test ignore seconds", time.Minute + time.Second, "1m"},
+		{"Test negative hours", -time.Hour, ""},
+		{"Test negative minutes", -time.Minute, ""},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := formatDuration(tt.duration)
+			if got != tt.want {
+				t.Errorf("formatDuration() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestRouter_readRecipeHandler(t *testing.T) {
 	tests := []struct {
 		name string // description of this test case

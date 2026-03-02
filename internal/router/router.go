@@ -200,6 +200,26 @@ func formatStepSections(stepText string) []stepSection {
 	return outStepSections
 }
 
+// Format the duration to hours and minutes (ignores seconds)
+// Returns empty if duration is less than a minute
+func formatDuration(duration time.Duration) string {
+	durationHours := int(duration.Hours())
+	durationMinutes := int(duration.Minutes()) % 60
+
+	useHours := durationHours > 0
+	useMinutes := durationMinutes > 0
+
+	if useHours && useMinutes {
+		return fmt.Sprintf("%dh %dm", durationHours, durationMinutes)
+	} else if useHours {
+		return fmt.Sprintf("%dh", durationHours)
+	} else if useMinutes {
+		return fmt.Sprintf("%dm", durationMinutes)
+	} else {
+		return ""
+	}
+}
+
 func (router *Router) readRecipeHandler(w http.ResponseWriter, r *http.Request) {
 	type data struct {
 		RecipeName         string
@@ -225,14 +245,8 @@ func (router *Router) readRecipeHandler(w http.ResponseWriter, r *http.Request) 
 	builder := internal.TestRecipeDataStrategy{}
 	recipeData := builder.ReadRecipe(recipeId)
 
-	// Format the times
-	prepTimeHours := int(recipeData.PrepTime.Hours())
-	prepTimeMinutes := int(recipeData.PrepTime.Minutes()) % 60
-	prepTimeFormatted := fmt.Sprintf("%dh %dm", prepTimeHours, prepTimeMinutes)
-
-	totalTimeHours := int(recipeData.TotalTime.Hours())
-	totalTimeMinutes := int(recipeData.TotalTime.Minutes()) % 60
-	totalTimeFormatted := fmt.Sprintf("%dh %dm", totalTimeHours, totalTimeMinutes)
+	prepTimeFormatted := formatDuration(recipeData.PrepTime)
+	totalTimeFormatted := formatDuration(recipeData.TotalTime)
 
 	ingredientSections := formatIngredientSections(recipeData.Ingredients)
 
@@ -279,8 +293,8 @@ type editTemplateData struct {
 	SubmitURL   string
 	RecipeName  string
 	Author      string
-	PrepTime    time.Duration
-	TotalTime   time.Duration
+	PrepTime    string
+	TotalTime   string
 	Yield       string
 	Ingredients string
 	Image       string
@@ -320,8 +334,8 @@ func (router *Router) editGetRecipeHandler(w http.ResponseWriter, r *http.Reques
 		SubmitURL:    fmt.Sprintf("/edit/%d", recipeId),
 		RecipeName:   recipeData.RecipeName,
 		Author:       recipeData.Author,
-		PrepTime:     recipeData.PrepTime,
-		TotalTime:    recipeData.TotalTime,
+		PrepTime:     formatDuration(recipeData.PrepTime),
+		TotalTime:    formatDuration(recipeData.TotalTime),
 		Yield:        recipeData.Yield,
 		Ingredients:  recipeData.Ingredients,
 		Image:        recipeData.Image,
@@ -357,13 +371,13 @@ func fillDataFromForm(r *http.Request) (internal.RecipeData, error) {
 
 	// Parse any non-string fields
 	prepTime := time.Second
-	if prepTime, err = time.ParseDuration(prepTimeStr); err != nil {
+	if prepTime, err = time.ParseDuration(strings.ReplaceAll(prepTimeStr, " ", "")); err != nil {
 		log.Printf("Failed to parse prepTime \"%s\": %s", prepTimeStr, err)
 		return internal.RecipeData{}, err
 	}
 
 	totalTime := time.Second
-	if totalTime, err = time.ParseDuration(totalTimeStr); err != nil {
+	if totalTime, err = time.ParseDuration(strings.ReplaceAll(totalTimeStr, " ", "")); err != nil {
 		log.Printf("Failed to parse totalTime \"%s\": %s", totalTimeStr, err)
 		return internal.RecipeData{}, err
 	}
@@ -456,7 +470,7 @@ func (router *Router) searchGetRecipeHandler(w http.ResponseWriter, r *http.Requ
 	// Parse any non-string fields
 	prepTime := time.Second
 	if formData.PrepTime != "" {
-		if prepTime, err = time.ParseDuration(formData.PrepTime); err != nil {
+		if prepTime, err = time.ParseDuration(strings.ReplaceAll(formData.PrepTime, " ", "")); err != nil {
 			log.Printf("Failed to parse prepTime \"%s\": %s", formData.PrepTime, err)
 			http.Error(w, "Invalid form data: Prep Time", http.StatusBadRequest)
 			return
@@ -465,7 +479,7 @@ func (router *Router) searchGetRecipeHandler(w http.ResponseWriter, r *http.Requ
 
 	totalTime := time.Second
 	if formData.TotalTime != "" {
-		if totalTime, err = time.ParseDuration(formData.TotalTime); err != nil {
+		if totalTime, err = time.ParseDuration(strings.ReplaceAll(formData.TotalTime, " ", "")); err != nil {
 			log.Printf("Failed to parse totalTime \"%s\": %s", formData.TotalTime, err)
 			http.Error(w, "Invalid form data: Total Time", http.StatusBadRequest)
 			return
@@ -530,8 +544,8 @@ func (router *Router) createGetRecipeHandler(w http.ResponseWriter, r *http.Requ
 		SubmitURL:   "/create",
 		RecipeName:  "",
 		Author:      "",
-		PrepTime:    time.Hour + time.Minute,
-		TotalTime:   time.Hour + time.Minute,
+		PrepTime:    formatDuration(time.Hour),
+		TotalTime:   formatDuration(time.Hour),
 		Yield:       "",
 		Ingredients: "",
 		Image:       "",
