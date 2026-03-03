@@ -2,25 +2,32 @@ const addIngredientButton = document.getElementById("add-ingredient");
 const ingredientsContainer = document.getElementById("ingredients-container");
 const ingredientCount = document.getElementById("ingredient-count");
 
-function reassignIngredientIds(ingredientList) {
-	ingredientList.forEach((ingredientFormGroup, i) => {
-		// Rename the inputs
-		let ingredientInput = ingredientFormGroup.querySelector("input");
-		ingredientInput.id = "ingredient-" + i;
-		ingredientInput.name = "ingredient-" + i;
-		// Rename the buttons
-		let ingredientRemoveButton = ingredientFormGroup.querySelector("button");
-		ingredientRemoveButton.id = "remove-ingredient-" + i;
-	});
+function assignIngredientNumber(ingredientFormGroup, index) {
+	// Rename the inputs
+	let ingredientInput = ingredientFormGroup.querySelector("input");
+	ingredientInput.id = "ingredient-" + index;
+	ingredientInput.name = "ingredient-" + index;
+	// Rename the buttons
+	let ingredientRemoveButton = ingredientFormGroup.querySelector("button");
+	ingredientRemoveButton.id = "remove-ingredient-" + index;
 }
 
 function setupRemoval(ingredientFormGroup) {
 	let button = ingredientFormGroup.querySelector("button");
 	button.addEventListener("click", () => {
-		ingredientFormGroup.remove();
-		let ingredientList = document.querySelectorAll(".ingredient-group");
-		reassignIngredientIds(ingredientList);
-		ingredientCount.value = ingredientList.length;
+		function assignNumbers() {
+			let ingredientList = document.querySelectorAll(".ingredient-group");
+			ingredientList.forEach((ingredientFormGroup, i) => assignIngredientNumber(ingredientFormGroup, i));
+			ingredientCount.value = ingredientList.length;
+		}
+
+		if (!document.startViewTransition) {
+			ingredientFormGroup.remove();
+			assignNumbers();
+		} else {
+			const transition = document.startViewTransition(() => ingredientFormGroup.remove());
+			transition.finished.then(assignNumbers);
+		}
 	});
 }
 
@@ -34,17 +41,26 @@ addIngredientButton.addEventListener("click", () => {
 		let ingredientGroup = clone.children[0];
 		setupRemoval(ingredientGroup);
 
-		// Add the clone to the container
-		ingredientsContainer.insertBefore(clone, addIngredientButton);
-
 		let ingredientList = document.querySelectorAll(".ingredient-group");
-		reassignIngredientIds(ingredientList);
-		ingredientCount.value = ingredientList.length;
+		assignIngredientNumber(ingredientGroup, ingredientList.length);
+		ingredientCount.value = ingredientList.length + 1;
+
+		// Add the clone to the container
+		function insertClone() {
+			ingredientsContainer.insertBefore(clone, addIngredientButton);
+		}
+
+		if (!document.startViewTransition) {
+			insertClone();
+		} else {
+			const transition = document.startViewTransition(() => insertClone());
+		}
 	}
 });
 
 // Set up removal for any ingredients added by the golang template
 let ingredientsList = document.querySelectorAll(".ingredient-group");
-ingredientsList.forEach((ingredientGroup) => {
+ingredientsList.forEach((ingredientGroup, i) => {
 	setupRemoval(ingredientGroup)
+	assignIngredientNumber(ingredientGroup, i);
 });

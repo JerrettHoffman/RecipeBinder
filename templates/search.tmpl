@@ -1,5 +1,5 @@
 {{define "content"}}
-	<form class="recipe-form" action="/search" method="get">
+	<form class="recipe-form search-form-animation" action="/search" method="get">
 		<div class="single-item-groups">
 			<div class="form-group">
 				<label for="recipe-name">Recipe Name:</label>
@@ -41,7 +41,7 @@
 					<button id="remove-ingredient-0" type="button">Remove</button>
 				</div>
 			</template>
-			<button id="add-ingredient" type="button">Add Ingredient</button>
+			<button id="add-ingredient" class="add-ingredient" type="button">Add Ingredient</button>
 			<script type="text/javascript" src="/assets/js/ingredient-input.js"></script>
 		</div>
 		<input type="submit" value="Submit">

@@ -554,6 +554,19 @@ input::file-selector-button:hover {
 	border-radius: 1rem;
 }
 
+.search-form-animation {
+	view-transition-name: --search-form;
+
+	> * {
+		view-transition-name: match-element;
+	}
+}
+
+::view-transition-old(--search-form),
+::view-transition-new(--search-form) {
+	height: 100%;
+}
+
 .recipe-form > * {
 	padding-block: 1rem;
 }
@@ -600,10 +613,15 @@ textarea:user-invalid{
 
 .ingredient-container {
 	padding-bottom: 2rem;
+
+	.add-ingredient {
+		view-transition-name: --add-ingredient;
+	}
 }
 
 .ingredient-group {
 	padding-block: 0.5rem;
+	view-transition-name: match-element;
 }
 
 .login-error {
@@ -641,5 +659,10 @@ textarea:user-invalid{
 		a {
 			font-size: 1.2rem;
 		}
+	}
+
+	/* Restrict to only first some children for perf */
+	li:nth-child(-n + 21) {
+		view-transition-name: match-element;
 	}
 }
