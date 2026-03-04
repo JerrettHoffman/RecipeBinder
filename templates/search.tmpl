@@ -32,16 +32,16 @@
 			{{range $i, $ingredient := .FormData.Ingredients}}
 			<div class="ingredient-group">
 				<input type="text" id="ingredient-{{$i}}" name="ingredient-{{$i}}" value="{{$ingredient}}">
-				<button id="remove-ingredient-{{$i}}" type="button">Remove</button>
+				<button type="button" command="--remove-ingredient" commandfor="ingredients-container">Remove</button>
 			</div>
 			{{end}}
 			<template id="ingredient-template">
 				<div class="ingredient-group">
 					<input type="text" id="ingredient-0" name="ingredient-0">
-					<button id="remove-ingredient-0" type="button">Remove</button>
+					<button type="button" command="--remove-ingredient" commandfor="ingredients-container">Remove</button>
 				</div>
 			</template>
-			<button id="add-ingredient" class="add-ingredient" type="button">Add Ingredient</button>
+			<button id="add-ingredient" class="add-ingredient" type="button" command="--add-ingredient" commandfor="ingredients-container">Add Ingredient</button>
 			<script type="text/javascript" src="/assets/js/ingredient-input.js"></script>
 		</div>
 		<input type="submit" value="Submit">

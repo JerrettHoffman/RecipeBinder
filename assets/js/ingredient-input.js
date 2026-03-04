@@ -1,5 +1,3 @@
-const addIngredientButton = document.getElementById("add-ingredient");
-const ingredientsContainer = document.getElementById("ingredients-container");
 const ingredientCount = document.getElementById("ingredient-count");
 
 function assignIngredientNumber(ingredientFormGroup, index) {
@@ -7,35 +5,30 @@ function assignIngredientNumber(ingredientFormGroup, index) {
 	let ingredientInput = ingredientFormGroup.querySelector("input");
 	ingredientInput.id = "ingredient-" + index;
 	ingredientInput.name = "ingredient-" + index;
-	// Rename the buttons
-	let ingredientRemoveButton = ingredientFormGroup.querySelector("button");
-	ingredientRemoveButton.id = "remove-ingredient-" + index;
 }
 
 function shouldViewTransition() {
 	return document.startViewTransition && window.matchMedia('(prefers-reduced-motion: no-preference)').matches;
 }
 
-function setupRemoval(ingredientFormGroup) {
-	let button = ingredientFormGroup.querySelector("button");
-	button.addEventListener("click", () => {
-		function assignNumbers() {
-			let ingredientList = document.querySelectorAll(".ingredient-group");
-			ingredientList.forEach((ingredientFormGroup, i) => assignIngredientNumber(ingredientFormGroup, i));
-			ingredientCount.value = ingredientList.length;
-		}
+function removeIngredient(ingredientsContainer, removeButton) {
+	let groupToRemove = removeButton.parentNode;
+	function assignNumbers() {
+		let ingredientList = ingredientsContainer.querySelectorAll(".ingredient-group");
+		ingredientList.forEach((ingredientFormGroup, i) => assignIngredientNumber(ingredientFormGroup, i));
+		ingredientCount.value = ingredientList.length;
+	}
 
-		if (!shouldViewTransition()) {
-			ingredientFormGroup.remove();
-			assignNumbers();
-		} else {
-			const transition = document.startViewTransition(() => ingredientFormGroup.remove());
-			transition.finished.then(assignNumbers);
-		}
-	});
+	if (!shouldViewTransition()) {
+		groupToRemove.remove();
+		assignNumbers();
+	} else {
+		const transition = document.startViewTransition(() => groupToRemove.remove());
+		transition.finished.then(assignNumbers);
+	}
 }
 
-addIngredientButton.addEventListener("click", () => {
+function addIngredient(ingredientsContainer, addIngredientButton) {
 	// Test to see if the browser supports the HTML template element by checking
 	// for the presence of the template element's content attribute.
 	if ("content" in document.createElement("template")) {
@@ -43,9 +36,8 @@ addIngredientButton.addEventListener("click", () => {
 		const clone = document.importNode(template.content, true);
 
 		let ingredientGroup = clone.children[0];
-		setupRemoval(ingredientGroup);
 
-		let ingredientList = document.querySelectorAll(".ingredient-group");
+		let ingredientList = ingredientsContainer.querySelectorAll(".ingredient-group");
 		assignIngredientNumber(ingredientGroup, ingredientList.length);
 		ingredientCount.value = ingredientList.length + 1;
 
@@ -60,11 +52,15 @@ addIngredientButton.addEventListener("click", () => {
 			const transition = document.startViewTransition(() => insertClone());
 		}
 	}
-});
+}
 
-// Set up removal for any ingredients added by the golang template
-let ingredientsList = document.querySelectorAll(".ingredient-group");
-ingredientsList.forEach((ingredientGroup, i) => {
-	setupRemoval(ingredientGroup)
-	assignIngredientNumber(ingredientGroup, i);
+let ingredientContainers = document.querySelectorAll(".ingredient-container");
+ingredientContainers.forEach((container, i) => {
+	container.addEventListener("command", e => {
+		if (e.command === "--remove-ingredient") {
+			removeIngredient(e.target, e.source);
+		} else if (e.command === "--add-ingredient") {
+			addIngredient(e.target, e.source);
+		}
+	});
 });
