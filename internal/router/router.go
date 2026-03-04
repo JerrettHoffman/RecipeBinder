@@ -53,9 +53,11 @@ type basePageData struct {
 }
 
 type Router struct {
-	Mux          *http.ServeMux
-	UserDatabase internal.UserAuthDataStrategy
-	Handler      http.Handler
+	Mux            *http.ServeMux
+	UserDatabase   internal.UserAuthDataStrategy
+	RecipeStore    internal.RecipeDataStrategy
+	RecipeSearcher internal.RecipeSearch
+	Handler        http.Handler
 }
 
 // Adds user data to the context
@@ -119,6 +121,9 @@ func (router *Router) Setup() {
 	router.UserDatabase = db.DbUserAuthDataStrategy{}
 	// TODO: remove demo logic
 	router.UserDatabase = &mock.MockUserAuth{}
+	mockRecipeDb := mock.MockRecipeDb{}
+	router.RecipeStore = &mockRecipeDb
+	router.RecipeSearcher = &mockRecipeDb
 }
 
 // Pulls the "id" value from the path wildcard
@@ -242,8 +247,11 @@ func (router *Router) readRecipeHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	builder := internal.TestRecipeDataStrategy{}
-	recipeData := builder.ReadRecipe(recipeId)
+	recipeData, err := router.RecipeStore.ReadRecipe(recipeId)
+	if err != nil {
+		http.Redirect(w, r, "/search", http.StatusFound)
+		return
+	}
 
 	prepTimeFormatted := formatDuration(recipeData.PrepTime)
 	totalTimeFormatted := formatDuration(recipeData.TotalTime)
@@ -317,8 +325,10 @@ func (router *Router) editGetRecipeHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	builder := internal.TestRecipeDataStrategy{}
-	recipeData := builder.ReadRecipe(recipeId)
+	recipeData, err := router.RecipeStore.ReadRecipe(recipeId)
+	if err != nil {
+		http.Redirect(w, r, "/search", http.StatusFound)
+	}
 
 	// Authorize
 	if recipeData.Uploader != userData.User {
@@ -362,7 +372,7 @@ func fillDataFromForm(r *http.Request) (internal.RecipeData, error) {
 	totalTimeStr := r.PostFormValue("total-time")
 	yield := r.PostFormValue("yield")
 	finalImage := r.PostFormValue("final-image")
-	ingredientsStr := r.PostFormValue("ingredient")
+	ingredientsStr := r.PostFormValue("ingredients")
 	steps := r.PostFormValue("steps")
 
 	// Parse any non-string fields
@@ -422,8 +432,7 @@ func (router *Router) editPostRecipeHandler(w http.ResponseWriter, r *http.Reque
 	dbData.Uploader = userData.User
 
 	// Send to DB
-	builder := internal.TestRecipeDataStrategy{}
-	if err = builder.UpdateRecipe(dbData, recipeId); err != nil {
+	if err = router.RecipeStore.UpdateRecipe(dbData, recipeId); err != nil {
 		http.Error(w, "Could not update recipe", http.StatusInternalServerError)
 		return
 	}
@@ -506,8 +515,7 @@ func (router *Router) searchGetRecipeHandler(w http.ResponseWriter, r *http.Requ
 		Ingredients:  formData.Ingredients,
 	}
 
-	searcher := internal.TestSearch{}
-	searchResults := searcher.Search(searchParams)
+	searchResults := router.RecipeSearcher.Search(searchParams)
 
 	type data struct {
 		FormData searchFormData
@@ -591,8 +599,7 @@ func (router *Router) createPostRecipeHandler(w http.ResponseWriter, r *http.Req
 	dbData.Uploader = userData.User
 
 	// Send to DB
-	builder := internal.TestRecipeDataStrategy{}
-	id, err := builder.CreateRecipe(dbData, userData.Id)
+	id, err := router.RecipeStore.CreateRecipe(dbData, userData.Id)
 	if err != nil {
 		http.Error(w, "Could not create recipe", http.StatusInternalServerError)
 		return
