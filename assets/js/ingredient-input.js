@@ -12,6 +12,10 @@ function assignIngredientNumber(ingredientFormGroup, index) {
 	ingredientRemoveButton.id = "remove-ingredient-" + index;
 }
 
+function shouldViewTransition() {
+	return document.startViewTransition && window.matchMedia('(prefers-reduced-motion: no-preference)').matches;
+}
+
 function setupRemoval(ingredientFormGroup) {
 	let button = ingredientFormGroup.querySelector("button");
 	button.addEventListener("click", () => {
@@ -21,7 +25,7 @@ function setupRemoval(ingredientFormGroup) {
 			ingredientCount.value = ingredientList.length;
 		}
 
-		if (!document.startViewTransition) {
+		if (!shouldViewTransition()) {
 			ingredientFormGroup.remove();
 			assignNumbers();
 		} else {
@@ -50,7 +54,7 @@ addIngredientButton.addEventListener("click", () => {
 			ingredientsContainer.insertBefore(clone, addIngredientButton);
 		}
 
-		if (!document.startViewTransition) {
+		if (!shouldViewTransition()) {
 			insertClone();
 		} else {
 			const transition = document.startViewTransition(() => insertClone());

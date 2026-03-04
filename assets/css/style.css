@@ -613,8 +613,17 @@ textarea:user-invalid{
 
 .ingredient-container {
 	padding-bottom: 2rem;
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+	gap: 0.5rem 1rem;
+
+	> p {
+		grid-column: 1 / -1;
+	}
 
 	.add-ingredient {
+		grid-column: 1 / 1;
+		width: fit-content;
 		view-transition-name: --add-ingredient;
 	}
 }
