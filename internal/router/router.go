@@ -221,7 +221,7 @@ func formatDuration(duration time.Duration) string {
 	} else if useMinutes {
 		return fmt.Sprintf("%dm", durationMinutes)
 	} else {
-		return ""
+		return "0m"
 	}
 }
 
