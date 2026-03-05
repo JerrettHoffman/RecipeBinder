@@ -28,6 +28,7 @@
 		</div>
 		<div id="ingredients-container" class="ingredient-container">
 			<p>Ingredients:</p>
+			<noscript>To set the number of ingredient inputs, modify the "ingredient-count" URL query param</noscript>
 			<input type="hidden" id="ingredient-count" name="ingredient-count" value="{{if .FormData.IngredientCount}}{{.FormData.IngredientCount}}{{else}}0{{end}}">
 			{{range $i, $ingredient := .FormData.Ingredients}}
 			<div class="ingredient-group">

@@ -619,6 +619,11 @@ textarea:user-invalid{
 
 	> p {
 		grid-column: 1 / -1;
+		margin-bottom: 0;
+	}
+
+	noscript {
+		grid-column: 1 / -1;
 	}
 
 	.add-ingredient {

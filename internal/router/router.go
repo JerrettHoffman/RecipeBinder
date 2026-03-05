@@ -523,6 +523,13 @@ func (router *Router) searchGetRecipeHandler(w http.ResponseWriter, r *http.Requ
 		basePageData
 	}
 
+	// The initial GET request likely has no query params
+	// Provide one empty ingredient input on the page in this case
+	if formData.IngredientCount == "" && formData.Ingredients == nil {
+		formData.Ingredients = []string{""}
+		formData.IngredientCount = "1"
+	}
+
 	pageData := data{
 		FormData:     formData,
 		Results:      searchResults,
