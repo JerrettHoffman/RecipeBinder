@@ -14,7 +14,12 @@
 {{end}}
 
 {{define "content"}}
-	<h1>Recipe Name</h1>
+	<div class="recipe-title-container">
+		<h1>Recipe Name</h1>
+		{{if .CanEdit}}
+		<a href="/edit/{{.RecipeId}}">Edit</a>
+		{{end}}
+	</div>
 	<div class="recipe-metadata-container">
 		<div class="recipe-metadata">
 			<p><b>By:</b></p>
@@ -53,10 +58,9 @@
 		{{end}}
 	{{end}}
 	</main>
-	<button class="open-ingredient-popup" id="open-ingredient-popup">Show Ingredients</button>
+	<button class="open-ingredient-popup" id="open-ingredient-popup" command="show-modal" commandfor="ingredient-popup">Show Ingredients</button>
 	<dialog class="ingredient-popup" id="ingredient-popup" closedby="any">
-	<button id="close-ingredient-popup" autofocus>Close Ingredients</button>
+	<button id="close-ingredient-popup" command="close" commandfor="ingredient-popup" autofocus>Close Ingredients</button>
 	{{template "ingredientsList" .}}
 	</dialog>
-	<script type="text/javascript" src="/assets/js/read-page.js"></script>
 {{end}}

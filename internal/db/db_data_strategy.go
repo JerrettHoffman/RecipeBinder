@@ -38,8 +38,8 @@ func (d DbRecipeDataStrategy) CreateRecipe(recipe internal.RecipeData, userId in
 	newRecipeId, err := insertRecipe(dbRecipe{
 		Id:             "",
 		Name:           recipe.RecipeName,
-		AuthorId:       int(authorId),
-		UploaderId:     int(userId),
+		AuthorId:       authorId,
+		UploaderId:     userId,
 		PrepTime:       int(recipe.PrepTime),
 		TotalTime:      int(recipe.TotalTime),
 		Steps:          recipe.Steps,
@@ -106,6 +106,9 @@ type DbUserAuthDataStrategy struct{}
 func (d DbUserAuthDataStrategy) ReadAuthUser(userName string) (internal.UserAuthData, error) {
 	return internal.UserAuthData{}, nil
 }
-func (d DbUserAuthDataStrategy) CreateAuthUser(userName string) error {
+func (d DbUserAuthDataStrategy) CreateAuthUser(userName string, hashedPw string) error {
+	return nil
+}
+func (d DbUserAuthDataStrategy) UpdateAuthUser(currUserId internal.ID, newUser internal.UserAuthData) error {
 	return nil
 }

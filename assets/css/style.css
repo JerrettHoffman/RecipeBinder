@@ -410,10 +410,19 @@ template {
 html {
 	background-color: var(--rp-base);
 	color: var(--rp-text);
+	scrollbar-gutter: stable both-edges;
 }
 
 ::selection {
 	background-color: var(--rp-gold);
+}
+
+a {
+	color: var(--rp-pine);
+}
+
+a:visited {
+	color: var(--rp-iris);
 }
 
 header {
@@ -462,6 +471,18 @@ main {
 	padding-inline: 1rem;
 }
 
+.signup-link {
+	display: block;
+	width: fit-content;
+	margin-left: auto;
+}
+
+.recipe-title-container{
+	display: flex;
+	align-items: center;
+	gap: 2rem;
+}
+
 .recipe-metadata-container {
 	display: flex;
 
@@ -496,51 +517,8 @@ a:focus-visible {
 	outline-offset: 3px;
 }
 
-.recipe-form {
-	margin-top: 1rem;
-	padding: 1rem;
-	background-color: var(--rp-overlay);
-	border-radius: 1rem;
-}
-
-.recipe-form > * {
-	padding-block: 1rem;
-}
-
-.form-group {
-	margin-top: 1rem;
-	display: grid;
-}
-
-input:user-invalid,
-textarea:user-invalid{
-	background-color: var(--rp-highlight-med);
-	border-color: var(--rp-love);
-}
-
-.textarea-group {
-	display: grid;
-}
-
-.ingredient-error {
-	visibility: hidden;
-	color: var(--rp-love);
-}
-
-.ingredient-error:has(+ .ingredient-area:user-invalid) {
-
-	visibility: visible;
-}
-
-.ingredient-area {
-	min-height: 15lh;
-}
-
-.steps-area {
-	min-height: 20lh;
-}
-
 input[type="text"],
+input[type="password"],
 textarea {
 	background-color: var(--rp-surface);
 	border: 1px solid var(--rp-muted);
@@ -562,11 +540,78 @@ button {
 	}
 }
 
+:root {
+	view-transition-name: none;
+}
+
 /* Seems like this should be covered by the & above, but it's not,
  * so we explicitly set the hover here
  */
 input::file-selector-button:hover {
 	background-color: var(--rp-highlight-high);
+}
+
+.recipe-form {
+	margin-top: 1rem;
+	padding: 1rem;
+	background-color: var(--rp-overlay);
+	border-radius: 1rem;
+	view-transition-name: --recipe-form;
+}
+
+.search-form-animation-isolation {
+	view-transition-name: --search-form-animation-isolation;
+
+	input[type="submit"] {
+		view-transition-name: --search-submit;
+	}
+}
+
+::view-transition-new(--recipe-form),
+::view-transition-old(--recipe-form) {
+	animation: none;
+	height: 100%;
+}
+
+.results-link-list {
+	view-transition-name: --result-link-list;
+}
+
+.recipe-form > * {
+	padding-block: 1rem;
+}
+
+.form-group {
+	margin-top: 1rem;
+	display: grid;
+}
+
+input:user-invalid,
+textarea:user-invalid{
+	background-color: var(--rp-highlight-med);
+	border-color: var(--rp-love);
+}
+
+.textarea-group {
+	display: grid;
+}
+
+.form-error-message {
+	visibility: hidden;
+	color: var(--rp-love);
+}
+
+.textarea-group:has(:user-invalid) .form-error-message,
+.form-group:has(:user-invalid) .form-error-message {
+	visibility: visible;
+}
+
+.ingredient-area {
+	min-height: 15lh;
+}
+
+.steps-area {
+	min-height: 20lh;
 }
 
 .single-item-groups {
@@ -578,10 +623,44 @@ input::file-selector-button:hover {
 
 .ingredient-container {
 	padding-bottom: 2rem;
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+	gap: 0.5rem 1rem;
+
+	> p {
+		grid-column: 1 / -1;
+		margin-bottom: 0;
+	}
+
+	noscript {
+		grid-column: 1 / -1;
+	}
+
+	.add-ingredient {
+		grid-column: 1 / 1;
+		width: fit-content;
+		view-transition-name: --add-ingredient;
+	}
 }
 
 .ingredient-group {
 	padding-block: 0.5rem;
+	view-transition-name: match-element;
+}
+
+.login-error {
+	color: var(--rp-love);
+}
+
+.password-show-container {
+	min-height: 44px;
+	min-width: 44px;
+	width: fit-content;
+	margin-block: 0.5rem;
+
+	input {
+		margin-right: 0.5rem;
+	}
 }
 
 .create-choice-container {
@@ -589,10 +668,6 @@ input::file-selector-button:hover {
 	grid-template-columns: 1fr 1fr;
 	margin-top: 2rem;
 	justify-items: center;
-
-	a {
-		color: inherit;
-	}
 }
 
 .results-link-list {
@@ -606,7 +681,6 @@ input::file-selector-button:hover {
 		min-height: 2lh;
 
 		a {
-			color: inherit;
 			font-size: 1.2rem;
 		}
 	}
