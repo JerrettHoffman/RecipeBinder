@@ -2,7 +2,7 @@ package db
 
 import "RecipeBinder/internal"
 
-func insertAuthor(author DbAuthor) (internal.ID, error) {
+func insertAuthor(author dbAuthor) (internal.ID, error) {
 	q := dbQuery{
 		query: `
 		INSERT INTO authors (name)
@@ -22,7 +22,7 @@ func insertAuthor(author DbAuthor) (internal.ID, error) {
 	return id, nil
 }
 
-func insertUser(user DbUser) (internal.ID, error) {
+func insertUser(user dbUser) (internal.ID, error) {
 	q := dbQuery{
 		query: `
 		INSERT INTO users (username, hashed_password)
@@ -42,7 +42,7 @@ func insertUser(user DbUser) (internal.ID, error) {
 	return id, nil
 }
 
-func insertRecipe(recipe DbRecipe) (internal.ID, error) {
+func insertRecipe(recipe dbRecipe) (internal.ID, error) {
 	q := dbQuery{
 		query: `
 		INSERT INTO recipes (name, author_id, uploader_id, prep_time, total_time, steps, ingredient_text, yeild)
@@ -68,45 +68,7 @@ func insertRecipe(recipe DbRecipe) (internal.ID, error) {
 	return id, nil
 }
 
-func insertIngredient(ingredient DbIngredient) (internal.ID, error) {
-	q := dbQuery{
-		query: `
-		INSERT INTO ingredients (name)
-		VALUES (@ingredientName)
-		RETURNING id`,
-		args: dbInsertArgs{
-			"ingredientName": ingredient.Name,
-		},
-	}
-	id, err := q.dbQuerySingleRowReturningId()
-
-	if err != nil {
-		return -1, err
-	}
-
-	return id, nil
-}
-
-func insertRecipeIngredient(recipeIngredient DbRecipeIngredient) error {
-	q := dbQuery{
-		query: `
-		INSERT INTO recipe_ingredients (recipe_id, ingredient_id)
-		VALUES (@recipeId, @ingredientId)`,
-		args: dbInsertArgs{
-			"recipeId":     recipeIngredient.RecipeId,
-			"ingredientId": recipeIngredient.IngredientId,
-		},
-	}
-	err := q.dbExec()
-
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func findAuthor(authorName string) (internal.ID, error) {
+func findAuthorByName(authorName string) (internal.ID, error) {
 	q := dbQuery{
 		query: `
 		SELECT id FROM authors
@@ -118,8 +80,61 @@ func findAuthor(authorName string) (internal.ID, error) {
 
 	id, err := q.dbQuerySingleRowReturningId()
 	if err != nil {
-		return -1, nil
+		return -1, err
 	}
 
 	return id, nil
+}
+
+func getRecipeById(recipeId internal.ID) (dbRecipe, error) {
+	q := dbQuery{
+		query: `
+		SELECT * FROM recipes
+		WHERE id=@id`,
+		args: dbInsertArgs{
+			"id": recipeId,
+		},
+	}
+
+	recipe, err := q.dbQueryReturningSingleRecipe()
+	if err != nil {
+		return dbRecipe{}, err
+	}
+
+	return recipe, nil
+}
+
+func getAuthorById(authorId internal.ID) (dbAuthor, error) {
+	q := dbQuery{
+		query: `
+		SELECT * FROM authors
+		WHERE id=@id`,
+		args: dbInsertArgs{
+			"id": authorId,
+		},
+	}
+
+	author, err := q.dbQueryReturningSingleAuthor()
+	if err != nil {
+		return dbAuthor{}, err
+	}
+
+	return author, nil
+}
+
+func getUserNameById(userId internal.ID) (dbUser, error) {
+	q := dbQuery{
+		query: `
+		SELECT id, username FROM users
+		WHERE id=@id`,
+		args: dbInsertArgs{
+			"id": userId,
+		},
+	}
+	user, err := q.dbQueryReturningSingleUser()
+	if err != nil {
+		return dbUser{}, err
+	}
+
+	return user, nil
 }

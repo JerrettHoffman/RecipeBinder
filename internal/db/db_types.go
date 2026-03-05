@@ -1,34 +1,24 @@
 package db
 
-type DbIngredient struct {
+type dbAuthor struct {
 	Id   string
 	Name string
 }
 
-type DbAuthor struct {
-	Id   string
-	Name string
-}
-
-type DbUser struct {
+type dbUser struct {
 	Id             string
 	Username       string
 	HashedPassword string
 }
 
-type DbRecipe struct {
+type dbRecipe struct {
 	Id             string
 	Name           string
-	AuthorId       int
-	UploaderId     int
+	AuthorId       int `db: "author_id"`
+	UploaderId     int `db: "uploader_id"`
 	PrepTime       int
 	TotalTime      int
 	Steps          string
 	IngredientText string
 	Yeild          string
-}
-
-type DbRecipeIngredient struct {
-	RecipeId     string
-	IngredientId string
 }

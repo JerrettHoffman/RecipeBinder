@@ -3,6 +3,7 @@ package db
 import (
 	"RecipeBinder/internal"
 	"fmt"
+	"time"
 )
 
 type DbRecipeDataStrategy struct{}
@@ -13,7 +14,7 @@ func (d DbRecipeDataStrategy) CreateRecipe(recipe internal.RecipeData, userId in
 
 	//check if author exists, otherwise create new one
 	println("Check if author exists")
-	authorId, err := findAuthor(recipe.Author)
+	authorId, err := findAuthorByName(recipe.Author)
 	if err != nil {
 		return -1, err
 	}
@@ -21,7 +22,7 @@ func (d DbRecipeDataStrategy) CreateRecipe(recipe internal.RecipeData, userId in
 	if authorId == -1 {
 		println("Create new author Record")
 
-		authorId, err = insertAuthor(DbAuthor{
+		authorId, err = insertAuthor(dbAuthor{
 			Id:   "",
 			Name: recipe.Author,
 		})
@@ -34,7 +35,7 @@ func (d DbRecipeDataStrategy) CreateRecipe(recipe internal.RecipeData, userId in
 
 	println("Adding new recipe")
 
-	newRecipeId, err := insertRecipe(DbRecipe{
+	newRecipeId, err := insertRecipe(dbRecipe{
 		Id:             "",
 		Name:           recipe.RecipeName,
 		AuthorId:       int(authorId),
@@ -62,7 +63,37 @@ func (d DbRecipeDataStrategy) UpdateRecipe(recipe internal.RecipeData, recipeId 
 
 func (d DbRecipeDataStrategy) ReadRecipe(id internal.ID) (internal.RecipeData, error) {
 
-	return internal.RecipeData{}, nil
+	recipe, err := getRecipeById(id)
+
+	if err != nil {
+		return internal.RecipeData{}, fmt.Errorf("Error retrieving recipe from database %W", err)
+	}
+
+	author, authorErr := getAuthorById(recipe.AuthorId)
+
+	if authorErr != nil {
+		return internal.RecipeData{}, fmt.Errorf("Error retrieving author details: %W", authorErr)
+	}
+
+	uploader, uploaderErr := getUserNameById(recipe.UploaderId)
+
+	if uploaderErr != nil {
+		return internal.RecipeData{}, fmt.Errorf("Error retrieving user details: %W", uploaderErr)
+	}
+
+	recipeData := internal.RecipeData{
+		RecipeName:  recipe.Name,
+		Author:      author.Name,
+		Uploader:    uploader.Username,
+		PrepTime:    time.Duration(recipe.PrepTime),
+		TotalTime:   time.Duration(recipe.TotalTime),
+		Yield:       recipe.Yeild,
+		Ingredients: recipe.IngredientText,
+		Image:       "",
+		Steps:       recipe.Steps,
+	}
+
+	return recipeData, nil
 }
 
 // TODO: Needs to validate that recipeID and userID match before performing delete

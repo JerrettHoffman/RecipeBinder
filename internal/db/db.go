@@ -70,7 +70,70 @@ func (q dbQuery) dbQuerySingleRowReturningId() (internal.ID, error) {
 	return id, nil
 }
 
-// Use this function to primarily inser rows in the db when you do not need the ID returned
+func (q dbQuery) dbQueryReturningSingleAuthor() (dbAuthor, error) {
+	postgres, err := newPostgres(context.Background(), os.Getenv("DATABASE_URL"))
+	if err != nil {
+		return dbAuthor{}, fmt.Errorf("Table connection error: %w", err)
+	}
+
+	rows, dbErr := postgres.db.Query(context.Background(), q.query, q.args)
+
+	if dbErr != nil {
+		return dbAuthor{}, fmt.Errorf("Unable to read row: %w", dbErr)
+	}
+
+	author, structErr := pgx.CollectOneRow(rows, pgx.RowToStructByName[dbAuthor])
+
+	if structErr != nil {
+		return dbAuthor{}, fmt.Errorf("Unable to convert row to dbAuthor %W", structErr)
+	}
+
+	return author, nil
+}
+
+func (q dbQuery) dbQueryReturningSingleUser() (dbUser, error) {
+	postgres, err := newPostgres(context.Background(), os.Getenv("DATABASE_URL"))
+	if err != nil {
+		return dbUser{}, fmt.Errorf("Table connection error: %w", err)
+	}
+
+	rows, dbErr := postgres.db.Query(context.Background(), q.query, q.args)
+
+	if dbErr != nil {
+		return dbUser{}, fmt.Errorf("Unable to read row: %w", dbErr)
+	}
+
+	author, structErr := pgx.CollectOneRow(rows, pgx.RowToStructByName[dbUser])
+
+	if structErr != nil {
+		return dbUser{}, fmt.Errorf("Unable to convert row to dbAuthor %W", structErr)
+	}
+
+	return author, nil
+}
+
+func (q dbQuery) dbQueryReturningSingleRecipe() (dbRecipe, error) {
+	postgres, err := newPostgres(context.Background(), os.Getenv("DATABASE_URL"))
+	if err != nil {
+		return dbRecipe{}, fmt.Errorf("Table connection error: %w", err)
+	}
+
+	rows, dbErr := postgres.db.Query(context.Background(), q.query, q.args)
+
+	if dbErr != nil {
+		return dbRecipe{}, fmt.Errorf("Unable to read row: %w", dbErr)
+	}
+
+	author, structErr := pgx.CollectOneRow(rows, pgx.RowToStructByName[dbRecipe])
+
+	if structErr != nil {
+		return dbRecipe{}, fmt.Errorf("Unable to convert row to dbAuthor %W", structErr)
+	}
+
+	return author, nil
+}
+
+// Use this function to primarily insert rows in the db when you do not need the ID returned
 func (q dbQuery) dbExec() error {
 	postgres, err := newPostgres(context.Background(), os.Getenv("DB_URL"))
 	if err != nil {
