@@ -540,6 +540,10 @@ button {
 	}
 }
 
+:root {
+	view-transition-name: none;
+}
+
 /* Seems like this should be covered by the & above, but it's not,
  * so we explicitly set the hover here
  */
@@ -552,19 +556,25 @@ input::file-selector-button:hover {
 	padding: 1rem;
 	background-color: var(--rp-overlay);
 	border-radius: 1rem;
+	view-transition-name: --recipe-form;
 }
 
-.search-form-animation {
-	view-transition-name: --search-form;
+.search-form-animation-isolation {
+	view-transition-name: --search-form-animation-isolation;
 
-	> * {
-		view-transition-name: match-element;
+	input[type="submit"] {
+		view-transition-name: --search-submit;
 	}
 }
 
-::view-transition-old(--search-form),
-::view-transition-new(--search-form) {
+::view-transition-new(--recipe-form),
+::view-transition-old(--recipe-form) {
+	animation: none;
 	height: 100%;
+}
+
+.results-link-list {
+	view-transition-name: --result-link-list;
 }
 
 .recipe-form > * {
@@ -673,10 +683,5 @@ textarea:user-invalid{
 		a {
 			font-size: 1.2rem;
 		}
-	}
-
-	/* Restrict to only first some children for perf */
-	li:nth-child(-n + 21) {
-		view-transition-name: match-element;
 	}
 }
