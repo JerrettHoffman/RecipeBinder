@@ -3,7 +3,6 @@ package db
 import (
 	"RecipeBinder/internal"
 	"fmt"
-	"time"
 )
 
 type DbRecipeDataStrategy struct{}
@@ -15,9 +14,11 @@ func (d DbRecipeDataStrategy) CreateRecipe(recipe internal.RecipeData, userId in
 	//check if author exists, otherwise create new one
 	println("Check if author exists")
 	authorId, err := findAuthorByName(recipe.Author)
-	if err != nil {
-		return -1, err
-	}
+
+	// TODO: Returns an error if no author found, need to distinguish between this error and others, for now, attempt to insert if any error thrown here.
+	// if err != nil {
+	// 	return -1, err
+	// }
 
 	if authorId == -1 {
 		println("Create new author Record")
@@ -61,9 +62,9 @@ func (d DbRecipeDataStrategy) UpdateRecipe(recipe internal.RecipeData, recipeId 
 	return nil
 }
 
-func (d DbRecipeDataStrategy) ReadRecipe(id internal.ID) (internal.RecipeData, error) {
+func (d DbRecipeDataStrategy) ReadRecipe(recipeId internal.ID) (internal.RecipeData, error) {
 
-	recipe, err := getRecipeById(id)
+	recipe, err := getRecipeById(recipeId)
 
 	if err != nil {
 		return internal.RecipeData{}, fmt.Errorf("Error retrieving recipe from database %W", err)
@@ -85,8 +86,8 @@ func (d DbRecipeDataStrategy) ReadRecipe(id internal.ID) (internal.RecipeData, e
 		RecipeName:  recipe.Name,
 		Author:      author.Name,
 		Uploader:    uploader.Username,
-		PrepTime:    time.Duration(recipe.PrepTime),
-		TotalTime:   time.Duration(recipe.TotalTime),
+		PrepTime:    recipe.PrepTime,
+		TotalTime:   recipe.TotalTime,
 		Yield:       recipe.Yeild,
 		Ingredients: recipe.IngredientText,
 		Image:       "",

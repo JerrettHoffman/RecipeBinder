@@ -122,8 +122,9 @@ func (router *Router) Setup() {
 	// TODO: remove demo logic
 	router.UserDatabase = &mock.MockUserAuth{}
 	mockRecipeDb := mock.MockRecipeDb{}
-	router.RecipeStore = &mockRecipeDb
+	router.RecipeStore = db.DbRecipeDataStrategy{}
 	router.RecipeSearcher = &mockRecipeDb
+
 }
 
 // Pulls the "id" value from the path wildcard
@@ -207,9 +208,9 @@ func formatStepSections(stepText string) []stepSection {
 
 // Format the duration to hours and minutes (ignores seconds)
 // Returns empty if duration is less than a minute
-func formatDuration(duration time.Duration) string {
-	durationHours := int(duration.Hours())
-	durationMinutes := int(duration.Minutes()) % 60
+func formatDuration(duration int) string {
+	durationHours := duration / 60
+	durationMinutes := duration % 60
 
 	useHours := durationHours > 0
 	useMinutes := durationMinutes > 0
@@ -243,12 +244,15 @@ func (router *Router) readRecipeHandler(w http.ResponseWriter, r *http.Request) 
 
 	recipeId, err := parseID(r)
 	if err != nil {
+		log.Printf("Error Reading recipe %v", err)
 		http.Redirect(w, r, "/search", http.StatusFound)
 		return
 	}
 
 	recipeData, err := router.RecipeStore.ReadRecipe(recipeId)
 	if err != nil {
+		log.Printf("Error Reading recipe %v", err)
+
 		http.Redirect(w, r, "/search", http.StatusFound)
 		return
 	}
@@ -392,8 +396,8 @@ func fillDataFromForm(r *http.Request) (internal.RecipeData, error) {
 		RecipeName:  recipeName,
 		Author:      author,
 		Uploader:    "",
-		PrepTime:    prepTime,
-		TotalTime:   totalTime,
+		PrepTime:    int(prepTime.Minutes()),
+		TotalTime:   int(totalTime.Minutes()),
 		Yield:       yield,
 		Ingredients: ingredientsStr,
 		Image:       finalImage,
@@ -432,7 +436,7 @@ func (router *Router) editPostRecipeHandler(w http.ResponseWriter, r *http.Reque
 	dbData.Uploader = userData.User
 
 	// Send to DB
-	if err = router.RecipeStore.UpdateRecipe(dbData, recipeId); err != nil {
+	if err = router.RecipeStore.UpdateRecipe(dbData, recipeId, userData.Id); err != nil {
 		http.Error(w, "Could not update recipe", http.StatusInternalServerError)
 		return
 	}
@@ -509,8 +513,8 @@ func (router *Router) searchGetRecipeHandler(w http.ResponseWriter, r *http.Requ
 		RecipeName:   formData.RecipeName,
 		AuthorName:   formData.Author,
 		UploaderName: formData.Uploader,
-		PrepTime:     prepTime,
-		TotalTime:    totalTime,
+		PrepTime:     int(prepTime.Minutes()),
+		TotalTime:    int(totalTime.Minutes()),
 		Yeild:        formData.Yield,
 		Ingredients:  formData.Ingredients,
 	}
@@ -555,8 +559,8 @@ func (router *Router) createGetRecipeHandler(w http.ResponseWriter, r *http.Requ
 		SubmitURL:   "/create",
 		RecipeName:  "",
 		Author:      "",
-		PrepTime:    formatDuration(time.Hour),
-		TotalTime:   formatDuration(time.Hour),
+		PrepTime:    formatDuration(60),
+		TotalTime:   formatDuration(60),
 		Yield:       "",
 		Ingredients: "",
 		Image:       "",
@@ -608,6 +612,7 @@ func (router *Router) createPostRecipeHandler(w http.ResponseWriter, r *http.Req
 	// Send to DB
 	id, err := router.RecipeStore.CreateRecipe(dbData, userData.Id)
 	if err != nil {
+		log.Printf("Failed to create recipe %v", err)
 		http.Error(w, "Could not create recipe", http.StatusInternalServerError)
 		return
 	}

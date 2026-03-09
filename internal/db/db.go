@@ -103,13 +103,13 @@ func (q dbQuery) dbQueryReturningSingleUser() (dbUser, error) {
 		return dbUser{}, fmt.Errorf("Unable to read row: %w", dbErr)
 	}
 
-	author, structErr := pgx.CollectOneRow(rows, pgx.RowToStructByName[dbUser])
+	user, structErr := pgx.CollectOneRow(rows, pgx.RowToStructByName[dbUser])
 
 	if structErr != nil {
-		return dbUser{}, fmt.Errorf("Unable to convert row to dbAuthor %W", structErr)
+		return dbUser{}, fmt.Errorf("Unable to convert row to dbUser %W", structErr)
 	}
 
-	return author, nil
+	return user, nil
 }
 
 func (q dbQuery) dbQueryReturningSingleRecipe() (dbRecipe, error) {
@@ -124,13 +124,13 @@ func (q dbQuery) dbQueryReturningSingleRecipe() (dbRecipe, error) {
 		return dbRecipe{}, fmt.Errorf("Unable to read row: %w", dbErr)
 	}
 
-	author, structErr := pgx.CollectOneRow(rows, pgx.RowToStructByName[dbRecipe])
+	recipe, structErr := pgx.CollectOneRow(rows, pgx.RowToStructByName[dbRecipe])
 
 	if structErr != nil {
-		return dbRecipe{}, fmt.Errorf("Unable to convert row to dbAuthor %W", structErr)
+		return dbRecipe{}, fmt.Errorf("Unable to convert row to dbRecipe %W", structErr)
 	}
 
-	return author, nil
+	return recipe, nil
 }
 
 // Use this function to primarily insert rows in the db when you do not need the ID returned

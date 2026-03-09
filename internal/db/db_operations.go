@@ -89,7 +89,7 @@ func findAuthorByName(authorName string) (internal.ID, error) {
 func getRecipeById(recipeId internal.ID) (dbRecipe, error) {
 	q := dbQuery{
 		query: `
-		SELECT * FROM recipes
+		SELECT id, name, author_id, uploader_id, prep_time, total_time, steps, ingredient_text, yeild FROM recipes
 		WHERE id=@id`,
 		args: dbInsertArgs{
 			"id": recipeId,

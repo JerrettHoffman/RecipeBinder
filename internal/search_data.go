@@ -1,14 +1,12 @@
 package internal
 
-import "time"
-
 // Assume we are "and-ing" all of the search parameters
 type SearchParams struct {
 	RecipeName   string
 	AuthorName   string
 	UploaderName string
-	PrepTime     time.Duration
-	TotalTime    time.Duration
+	PrepTime     int //PrepTime in minutes
+	TotalTime    int // TotalTime in minutes
 	Yeild        string
 	Ingredients  []string
 }
