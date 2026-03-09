@@ -1,6 +1,9 @@
 package db
 
-import "RecipeBinder/internal"
+import (
+	"RecipeBinder/internal"
+	"fmt"
+)
 
 func insertAuthor(author dbAuthor) (internal.ID, error) {
 	q := dbQuery{
@@ -22,7 +25,7 @@ func insertAuthor(author dbAuthor) (internal.ID, error) {
 	return id, nil
 }
 
-func insertUser(user dbUser) (internal.ID, error) {
+func insertUser(user dbUserAuth) (internal.ID, error) {
 	q := dbQuery{
 		query: `
 		INSERT INTO users (username, hashed_password)
@@ -122,7 +125,40 @@ func getAuthorById(authorId internal.ID) (dbAuthor, error) {
 	return author, nil
 }
 
-func getUserNameById(userId internal.ID) (dbUser, error) {
+func getUserById(userId internal.ID) (dbUserAuth, error) {
+	q := dbQuery{
+		query: `
+		SELECT id, username FROM users
+		WHERE id=@id`,
+		args: dbInsertArgs{
+			"id": userId,
+		},
+	}
+	user, err := q.dbQueryReturningSingleAuthUser()
+	if err != nil {
+		return dbUserAuth{}, err
+	}
+
+	return user, nil
+}
+
+func findUserByUserName(userName string) (dbUserAuth, error) {
+	q := dbQuery{
+		query: `
+		SELECT * FROM users
+		WHERE username=@username`,
+		args: dbInsertArgs{
+			"username": userName,
+		},
+	}
+	user, err := q.dbQueryReturningSingleAuthUser()
+	if err != nil {
+		return dbUserAuth{}, fmt.Errorf("Error finding user by username: %W", err)
+	}
+	return user, nil
+}
+
+func getUsernameById(userId internal.ID) (string, error) {
 	q := dbQuery{
 		query: `
 		SELECT id, username FROM users
@@ -133,8 +169,8 @@ func getUserNameById(userId internal.ID) (dbUser, error) {
 	}
 	user, err := q.dbQueryReturningSingleUser()
 	if err != nil {
-		return dbUser{}, err
+		return "", err
 	}
 
-	return user, nil
+	return user.Username, nil
 }

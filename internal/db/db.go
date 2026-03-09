@@ -91,6 +91,27 @@ func (q dbQuery) dbQueryReturningSingleAuthor() (dbAuthor, error) {
 	return author, nil
 }
 
+func (q dbQuery) dbQueryReturningSingleAuthUser() (dbUserAuth, error) {
+	postgres, err := newPostgres(context.Background(), os.Getenv("DATABASE_URL"))
+	if err != nil {
+		return dbUserAuth{}, fmt.Errorf("Table connection error: %w", err)
+	}
+
+	rows, dbErr := postgres.db.Query(context.Background(), q.query, q.args)
+
+	if dbErr != nil {
+		return dbUserAuth{}, fmt.Errorf("Unable to read row: %w", dbErr)
+	}
+
+	user, structErr := pgx.CollectOneRow(rows, pgx.RowToStructByName[dbUserAuth])
+
+	if structErr != nil {
+		return dbUserAuth{}, fmt.Errorf("Unable to convert row to dbUser %W", structErr)
+	}
+
+	return user, nil
+}
+
 func (q dbQuery) dbQueryReturningSingleUser() (dbUser, error) {
 	postgres, err := newPostgres(context.Background(), os.Getenv("DATABASE_URL"))
 	if err != nil {

@@ -17,9 +17,16 @@ Potential names:
 
 <!-- List any prerequisites, libraries, operating system versions, or tools needed before installation or execution (e.g., Node.js, Python 3.x, Windows 10). -->
 
-### Installation
+A way to host a db locally, this doc will assume docker
+
+A db migration tool of your choosing, this doc will assume [Go Migrate](https://github.com/golang-migrate/migrate)
+
+### Local Development
+
 
 <!-- Provide clear, step-by-step instructions on how to download and install your project locally. Include code blocks for commands. -->
+
+
 
 ```bash
 # Example command: clone the repository
@@ -27,4 +34,6 @@ git clone https://github.com
 
 # Example command: install dependencies
 cd yourproject
-npm install
+npm install ```
+
+### Self Hosting Setup

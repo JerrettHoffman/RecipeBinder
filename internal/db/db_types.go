@@ -5,10 +5,15 @@ type dbAuthor struct {
 	Name string
 }
 
-type dbUser struct {
-	Id             string
+type dbUserAuth struct {
+	Id             int
 	Username       string
 	HashedPassword string
+}
+
+type dbUser struct {
+	Id       string
+	Username string
 }
 
 type dbRecipe struct {

@@ -120,7 +120,7 @@ func (router *Router) Setup() {
 	// Setup db
 	router.UserDatabase = db.DbUserAuthDataStrategy{}
 	// TODO: remove demo logic
-	router.UserDatabase = &mock.MockUserAuth{}
+	// router.UserDatabase = &mock.MockUserAuth{}
 	mockRecipeDb := mock.MockRecipeDb{}
 	router.RecipeStore = db.DbRecipeDataStrategy{}
 	router.RecipeSearcher = &mockRecipeDb
@@ -636,6 +636,7 @@ func (router *Router) signupPostRecipeHandler(w http.ResponseWriter, r *http.Req
 	}
 
 	if err := auth.CreateUser(r.FormValue("username"), r.FormValue("password"), router.UserDatabase); err != nil {
+		log.Printf("%v", err)
 		http.Error(w, "Invalid username or password", http.StatusBadRequest)
 		return
 	}

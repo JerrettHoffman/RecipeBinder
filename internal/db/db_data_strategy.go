@@ -76,7 +76,7 @@ func (d DbRecipeDataStrategy) ReadRecipe(recipeId internal.ID) (internal.RecipeD
 		return internal.RecipeData{}, fmt.Errorf("Error retrieving author details: %W", authorErr)
 	}
 
-	uploader, uploaderErr := getUserNameById(recipe.UploaderId)
+	uploader, uploaderErr := getUsernameById(recipe.UploaderId)
 
 	if uploaderErr != nil {
 		return internal.RecipeData{}, fmt.Errorf("Error retrieving user details: %W", uploaderErr)
@@ -85,7 +85,7 @@ func (d DbRecipeDataStrategy) ReadRecipe(recipeId internal.ID) (internal.RecipeD
 	recipeData := internal.RecipeData{
 		RecipeName:  recipe.Name,
 		Author:      author.Name,
-		Uploader:    uploader.Username,
+		Uploader:    uploader,
 		PrepTime:    recipe.PrepTime,
 		TotalTime:   recipe.TotalTime,
 		Yield:       recipe.Yeild,
@@ -104,12 +104,35 @@ func (d DbRecipeDataStrategy) DeleteRecipe(id internal.ID, userId internal.ID) e
 
 type DbUserAuthDataStrategy struct{}
 
+// Returns UserAuthData or error if no user of userName can be found
 func (d DbUserAuthDataStrategy) ReadAuthUser(userName string) (internal.UserAuthData, error) {
-	return internal.UserAuthData{}, nil
+	user, err := findUserByUserName(userName)
+
+	if err != nil {
+		return internal.UserAuthData{}, err
+	}
+
+	return internal.UserAuthData{
+		Id:             user.Id,
+		UserName:       user.Username,
+		HashedPassword: user.HashedPassword,
+	}, nil
 }
+
 func (d DbUserAuthDataStrategy) CreateAuthUser(userName string, hashedPw string) error {
+	_, err := insertUser(dbUserAuth{
+		Id:             -1,
+		Username:       userName,
+		HashedPassword: hashedPw,
+	})
+	if err != nil {
+		return fmt.Errorf("Error creating new auth user: %W", err)
+	}
+
 	return nil
 }
+
+// Thought needed here about forgotten password
 func (d DbUserAuthDataStrategy) UpdateAuthUser(currUserId internal.ID, newUser internal.UserAuthData) error {
 	return nil
 }
