@@ -5,7 +5,6 @@ import (
 	"log"
 	"sort"
 	"strings"
-	"time"
 
 	"errors"
 )
@@ -60,8 +59,8 @@ func (m *MockRecipeDb) Search(params internal.SearchParams) []internal.SearchRes
 			stringsMatch(params.AuthorName, recipe.Author) &&
 			stringsMatch(params.UploaderName, recipe.Uploader) &&
 			// 1s is the zero value for duration
-			(params.PrepTime == int(time.Second) || params.PrepTime == recipe.PrepTime) &&
-			(params.PrepTime == int(time.Second) || params.TotalTime == recipe.TotalTime) &&
+			(params.PrepTime == 0 || params.PrepTime == recipe.PrepTime) &&
+			(params.TotalTime == 0 || params.TotalTime == recipe.TotalTime) &&
 			stringsMatch(params.Yeild, recipe.Yield)
 
 		// Ingredients
