@@ -437,7 +437,7 @@ func (router *Router) editPostRecipeHandler(w http.ResponseWriter, r *http.Reque
 			formattedLines = append(formattedLines, line)
 		} else if match := regexp.MustCompile(`(?i)([\pL\pN].*)`).FindString(line); match != "" {
 			// Match the first alphanumeric character and everything after
-			formattedLines = append(formattedLines, "* " + match)
+			formattedLines = append(formattedLines, "* "+match)
 		}
 
 		// Lines without any alphanumeric characters are skipped
@@ -626,7 +626,7 @@ func (router *Router) createPostRecipeHandler(w http.ResponseWriter, r *http.Req
 			formattedLines = append(formattedLines, line)
 		} else if match := regexp.MustCompile(`(?i)([\pL\pN].*)`).FindString(line); match != "" {
 			// Match the first alphanumeric character and everything after
-			formattedLines = append(formattedLines, "* " + match)
+			formattedLines = append(formattedLines, "* "+match)
 		}
 
 		// Lines without any alphanumeric characters are skipped
