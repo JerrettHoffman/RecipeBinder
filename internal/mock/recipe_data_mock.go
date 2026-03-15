@@ -24,7 +24,7 @@ func (m *MockRecipeDb) ReadRecipe(recipeId internal.ID) (internal.RecipeData, er
 	}
 }
 
-func (m *MockRecipeDb) UpdateRecipe(recipe internal.RecipeData, recipeId internal.ID) error {
+func (m *MockRecipeDb) UpdateRecipe(recipe internal.RecipeData, recipeId internal.ID, userId internal.ID) error {
 	m.recipes[recipeId] = recipe
 	log.Printf("Updated recipe %d: %v", recipeId, recipe)
 	return nil
@@ -42,7 +42,7 @@ func (m *MockRecipeDb) CreateRecipe(recipe internal.RecipeData, uploaderId inter
 	return recipeId, nil
 }
 
-func (m *MockRecipeDb) DeleteRecipe(recipeId internal.ID) error {
+func (m *MockRecipeDb) DeleteRecipe(recipeId internal.ID, userId internal.ID) error {
 	delete(m.recipes, recipeId)
 	log.Printf("Deleted recipe %d", recipeId)
 	return nil
