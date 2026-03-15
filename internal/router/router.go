@@ -429,6 +429,21 @@ func (router *Router) editPostRecipeHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
+	lines := regexp.MustCompile("\r?\n").Split(dbData.Ingredients, -1)
+	formattedLines := make([]string, 0, 16)
+	for _, line := range lines {
+		if strings.HasPrefix(line, headerMarkup) {
+			// Leave lines that start with '## ' alone
+			formattedLines = append(formattedLines, line)
+		} else if match := regexp.MustCompile(`(?i)([\pL\pN].*)`).FindString(line); match != "" {
+			// Match the first alphanumeric character and everything after
+			formattedLines = append(formattedLines, "* " + match)
+		}
+
+		// Lines without any alphanumeric characters are skipped
+	}
+	dbData.Ingredients = strings.Join(formattedLines, "\r\n")
+
 	dbData.Uploader = userData.User
 
 	// Send to DB
@@ -602,6 +617,21 @@ func (router *Router) createPostRecipeHandler(w http.ResponseWriter, r *http.Req
 		http.Redirect(w, r, "/login", http.StatusFound)
 		return
 	}
+
+	lines := regexp.MustCompile("\r?\n").Split(dbData.Ingredients, -1)
+	formattedLines := make([]string, 0, 10)
+	for _, line := range lines {
+		if strings.HasPrefix(line, headerMarkup) {
+			// Leave lines that start with '## ' alone
+			formattedLines = append(formattedLines, line)
+		} else if match := regexp.MustCompile(`(?i)([\pL\pN].*)`).FindString(line); match != "" {
+			// Match the first alphanumeric character and everything after
+			formattedLines = append(formattedLines, "* " + match)
+		}
+
+		// Lines without any alphanumeric characters are skipped
+	}
+	dbData.Ingredients = strings.Join(formattedLines, "\r\n")
 
 	dbData.Uploader = userData.User
 

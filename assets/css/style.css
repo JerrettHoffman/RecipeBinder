@@ -469,6 +469,7 @@ main {
 	max-width: 60rem;
 	margin: auto;
 	padding-inline: 1rem;
+	font-variant-numeric: slashed-zero;
 }
 
 .signup-link {
@@ -601,13 +602,36 @@ textarea:user-invalid{
 	color: var(--rp-love);
 }
 
-.textarea-group:has(:user-invalid) .form-error-message,
 .form-group:has(:user-invalid) .form-error-message {
 	visibility: visible;
 }
 
+.textarea-and-preview {
+	display: grid;
+	/* Columns should ideally be min 50ch, unless the parent doesn't allow for that */
+	grid-template-columns: repeat(auto-fit, minmax(min(100%, 50ch), 1fr));
+	gap: 1rem;
+
+	.ingredient-area {
+		resize: none;
+	}
+}
+
 .ingredient-area {
 	min-height: 15lh;
+	overflow: auto;
+}
+
+.ingredient-area-preview {
+	white-space-collapse: preserve;
+	font-variant-numeric: diagonal-fractions;
+	background-color: var(--rp-highlight-med);
+	border: 1px solid var(--rp-muted);
+	border-radius: 0.25rem;
+	color: inherit;
+	/* To match behavior of textarea */
+	max-height: 15lh;
+	margin-block: 0;
 }
 
 .steps-area {

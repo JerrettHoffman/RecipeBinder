@@ -23,15 +23,26 @@
 				<input type="text" id="yield" name="yield" value="{{.Yield}}" required>
 			</div>
 		</div>
-		<div class="textarea-group">
-			<label for="ingredients">Ingredients:</label>
-			<span class="form-error-message" id="ingredient-error">Error (Invalid Formatting): Lines must begin with "## " (denoting a section header) or "* " (denoting an ingredient)</span>
-			<textarea class="ingredient-area" id="ingredients" name="ingredients" required>{{.Ingredients}}</textarea>
-			<script type="text/javascript" src="/assets/js/ingredient-area-validation.js"></script>
+		<p>For the ingredients and steps, add new sections by starting a line with "## " followed by the section name</p>
+		<div class="textarea-and-preview">
+			<div class="textarea-group">
+				<label for="ingredients">Ingredients:</label>
+				<textarea class="ingredient-area" id="ingredients" name="ingredients" required placeholder="This is an ingredient
+## This is a section
+This is an ingredient below the above section">{{.Ingredients}}</textarea>
+			</div>
+			<div class="textarea-group">
+				<label for="formatted-ingredients">Preview of Formatting:</label>
+				<p class="ingredient-area ingredient-area-preview" id="formatted-ingredients">{{.Ingredients}}</p>
+			</div>
+		</div>
+		<script type="text/javascript" src="/assets/js/ingredient-area-validation.js"></script>
 		</div>
 		<div class="textarea-group">
 			<label for="steps">Steps:</label>
-			<textarea class="steps-area" id="steps" name="steps" required>{{.Steps}}</textarea>
+			<textarea class="steps-area" id="steps" name="steps" required placeholder="This is a step paragraph
+## This is a section
+This is a paragraph below the above section">{{.Steps}}</textarea>
 		</div>
 		<input type="submit" value="Submit">
 	</form>
