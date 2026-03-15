@@ -60,8 +60,8 @@ func (m *MockRecipeDb) Search(params internal.SearchParams) []internal.SearchRes
 			stringsMatch(params.AuthorName, recipe.Author) &&
 			stringsMatch(params.UploaderName, recipe.Uploader) &&
 			// 1s is the zero value for duration
-			(params.PrepTime == time.Second || params.PrepTime == recipe.PrepTime) &&
-			(params.PrepTime == time.Second || params.TotalTime == recipe.TotalTime) &&
+			(params.PrepTime == int(time.Second) || params.PrepTime == recipe.PrepTime) &&
+			(params.PrepTime == int(time.Second) || params.TotalTime == recipe.TotalTime) &&
 			stringsMatch(params.Yeild, recipe.Yield)
 
 		// Ingredients

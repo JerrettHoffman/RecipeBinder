@@ -1,15 +1,13 @@
 package internal
 
-import "time"
-
 type ID = int
 
 type RecipeData struct {
 	RecipeName  string
 	Author      string
 	Uploader    string
-	PrepTime    time.Duration
-	TotalTime   time.Duration
+	PrepTime    int // Duration of preptime in minutes
+	TotalTime   int // Duration of TotalTime in minutes
 	Yield       string
 	Ingredients string
 	Image       string
@@ -18,7 +16,7 @@ type RecipeData struct {
 
 type RecipeDataStrategy interface {
 	ReadRecipe(recipeId ID) (RecipeData, error)
-	UpdateRecipe(recipe RecipeData, recipeId ID) error
+	UpdateRecipe(recipe RecipeData, recipeId ID, userId ID) error
 	CreateRecipe(recipe RecipeData, uploaderId ID) (ID, error)
-	DeleteRecipe(recipeId ID) error
+	DeleteRecipe(recipeId ID, userId ID) error
 }
