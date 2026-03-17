@@ -233,7 +233,7 @@ func (router *Router) indexHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := indexTpl.Execute(w, pageData); err != nil {
-		log.Printf("Failed to execute index\n", err)
+		log.Printf("Failed to execute index%v\n", err)
 		http.Error(w, "server error", http.StatusInternalServerError)
 	}
 }
