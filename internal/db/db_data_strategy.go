@@ -5,6 +5,14 @@ import (
 	"fmt"
 )
 
+type UserMismatchError struct {
+	Message string
+}
+
+func (e *UserMismatchError) Error() string {
+	return fmt.Sprintf("Error: ", e.Message)
+}
+
 type DbRecipeDataStrategy struct{}
 
 // We assume that the username in RecipeData uploader field comes from an already created user
@@ -37,7 +45,7 @@ func (d DbRecipeDataStrategy) CreateRecipe(recipe internal.RecipeData, userId in
 	println("Adding new recipe")
 
 	newRecipeId, err := insertRecipe(dbRecipe{
-		Id:             "",
+		Id:             -1,
 		Name:           recipe.RecipeName,
 		AuthorId:       authorId,
 		UploaderId:     userId,
@@ -56,9 +64,54 @@ func (d DbRecipeDataStrategy) CreateRecipe(recipe internal.RecipeData, userId in
 
 }
 
-// TODO: Needs to validate that recipe ID and User ID match before performing update
 func (d DbRecipeDataStrategy) UpdateRecipe(recipe internal.RecipeData, recipeId internal.ID, userId internal.ID) error {
-	// what to do if update orphans an author record?
+	// TODO: what to do if update orphans an author record?
+	recipeDB, recipeErr := getRecipeById(recipeId)
+	if recipeErr != nil {
+		return fmt.Errorf("Error retrieving recipe from database %W", recipeErr)
+	}
+
+	if userId != recipeDB.UploaderId {
+		return &UserMismatchError{
+			Message: "UserIds do not match",
+		}
+	}
+
+	authorId, authorErr := findAuthorByName(recipe.Author)
+
+	// TODO: Returns an error if no author found, need to distinguish between this error and others, for now, attempt to insert if any error thrown here.
+	// if err != nil {
+	// 	return -1, err
+	// }
+
+	if authorId == -1 {
+		println("Create new author Record")
+
+		authorId, authorErr = insertAuthor(dbAuthor{
+			Id:   "",
+			Name: recipe.Author,
+		})
+		if authorErr != nil {
+			return authorErr
+		}
+	}
+
+	updateErr := updateSingleRecipeValues(dbRecipe{
+		Id:             recipeId,
+		Name:           recipe.RecipeName,
+		AuthorId:       authorId,
+		UploaderId:     userId,
+		PrepTime:       int(recipe.PrepTime),
+		TotalTime:      int(recipe.TotalTime),
+		Steps:          recipe.Steps,
+		IngredientText: recipe.Ingredients,
+		Yeild:          recipe.Yield,
+	})
+
+	if updateErr != nil {
+		return updateErr
+	}
+
 	return nil
 }
 
@@ -136,3 +189,9 @@ func (d DbUserAuthDataStrategy) CreateAuthUser(userName string, hashedPw string)
 func (d DbUserAuthDataStrategy) UpdateAuthUser(currUserId internal.ID, newUser internal.UserAuthData) error {
 	return nil
 }
+
+type DBRecipeSearchStrategy struct{}
+
+// func (d DBRecipeSearchStrategy) Search(params internal.SearchParams) []internal.SearchResult {
+// 	return
+// }

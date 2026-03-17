@@ -437,6 +437,7 @@ func (router *Router) editPostRecipeHandler(w http.ResponseWriter, r *http.Reque
 
 	// Send to DB
 	if err = router.RecipeStore.UpdateRecipe(dbData, recipeId, userData.Id); err != nil {
+		log.Print(err)
 		http.Error(w, "Could not update recipe", http.StatusInternalServerError)
 		return
 	}

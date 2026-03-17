@@ -75,7 +75,7 @@ func updateSingleRecipeValues(recipe dbRecipe) error {
 	q := dbQuery{
 		query: `
 		UPDATE recipes
-		SET name = @recipeName, author_id = @authorId, uploader_id = @uploaderId, prep_time = @prepTime, total_time = @totalTime, steps = @steps, ingredient_text = @ingredientText, yeild = @yeild
+		SET(name = @recipeName, author_id = @authorId, uploader_id = @uploaderId, prep_time = @prepTime, total_time = @totalTime, steps = @steps, ingredient_text = @ingredientText, yeild = @yeild)
 		WHERE id=@id`,
 		args: dbInsertArgs{
 			"recipeName":     recipe.Name,
