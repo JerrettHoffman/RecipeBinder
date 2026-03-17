@@ -26,6 +26,18 @@ A db migration tool of your choosing, this doc will assume [Go Migrate](https://
 
 <!-- Provide clear, step-by-step instructions on how to download and install your project locally. Include code blocks for commands. -->
 
+Install the container solution of your choice docker podman and set up a postgres image
+
+Create a database for this project
+
+Install a migration tool (go-migrate)
+
+run
+```bash
+migrate -path internal/db/migrations -database "postgres://postgres:password@localhost:5432/postgres?sslmode=disable" -verbose up
+```
+
+
 
 
 ```bash
