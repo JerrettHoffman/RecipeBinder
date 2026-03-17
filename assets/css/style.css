@@ -473,6 +473,7 @@ header {
 main {
 	max-width: 60rem;
 	margin: auto;
+	margin-bottom: 3rem;
 	padding-inline: 1rem;
 	font-variant-numeric: slashed-zero;
 }
