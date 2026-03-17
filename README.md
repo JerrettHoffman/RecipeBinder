@@ -28,7 +28,7 @@ A db migration tool of your choosing, this doc will assume [Go Migrate](https://
 
 Install the container solution of your choice docker podman and set up a postgres image
 
-Create a database for this project
+Create a new postgres database for this project
 
 Install a migration tool (go-migrate)
 
@@ -37,15 +37,8 @@ run
 migrate -path internal/db/migrations -database "postgres://postgres:password@localhost:5432/postgres?sslmode=disable" -verbose up
 ```
 
-
-
-
+edit the .evn file locally to include
 ```bash
-# Example command: clone the repository
-git clone https://github.com
-
-# Example command: install dependencies
-cd yourproject
-npm install ```
-
-### Self Hosting Setup
+DATABASE_URL={YOUR_CONTAINER_POSTGRES_URL_HERE}
+TEMPLATE_DIRECTORY={ABSOLUTE_PATH_TO_TEMPLATE_DIRECTORY_IN_PROJECT}
+```
