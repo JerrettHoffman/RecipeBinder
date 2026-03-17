@@ -1,0 +1,4 @@
+{{define "content"}}
+<h1>Welcome to your shared recipe binder!</h1>
+<p>You can <a href="/search">Search</a> for recipes, {{if .HasValidSession}}or <a href="/add">Add</a> a new one!{{else}}<a href="login">Login</a> to an existing account, or <a href="signup">Sign Up</a> if you don't have an account!{{end}}</p>
+{{end}}
