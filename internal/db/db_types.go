@@ -19,8 +19,8 @@ type dbUser struct {
 type dbRecipe struct {
 	Id             int
 	Name           string
-	AuthorId       int `db: "author_id"`
-	UploaderId     int `db: "uploader_id"`
+	AuthorId       int `db:"author_id"`
+	UploaderId     int `db:"uploader_id"`
 	PrepTime       int
 	TotalTime      int
 	Steps          string

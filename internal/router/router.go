@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 
 	// TODO: remove demo logic
-	"RecipeBinder/internal/mock"
+	// "RecipeBinder/internal/mock"
 
 	"context"
 	"errors"
@@ -121,9 +121,9 @@ func (router *Router) Setup() {
 	router.UserDatabase = db.DbUserAuthDataStrategy{}
 	// TODO: remove demo logic
 	// router.UserDatabase = &mock.MockUserAuth{}
-	mockRecipeDb := mock.MockRecipeDb{}
+	// mockRecipeDb := mock.MockRecipeDb{}
 	router.RecipeStore = db.DbRecipeDataStrategy{}
-	router.RecipeSearcher = &mockRecipeDb
+	router.RecipeSearcher = db.DBRecipeSearchStrategy{}
 
 }
 

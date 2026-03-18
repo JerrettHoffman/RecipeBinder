@@ -12,8 +12,8 @@ type SearchParams struct {
 }
 
 type SearchResult struct {
-	RecipeName string
-	RecipeId   ID
+	RecipeName string `db:"name"`
+	RecipeId   ID     `db:"id"`
 }
 
 type RecipeSearch interface {

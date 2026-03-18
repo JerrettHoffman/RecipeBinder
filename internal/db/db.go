@@ -70,6 +70,27 @@ func (q dbQuery) dbQuerySingleRowReturningId() (internal.ID, error) {
 	return id, nil
 }
 
+func (q dbQuery) dbQueryMultipleRowsReturningIds() ([]internal.SearchResult, error) {
+	postgres, err := newPostgres(context.Background(), os.Getenv("DATABASE_URL"))
+	if err != nil {
+		return nil, fmt.Errorf("Table connection error: %w", err)
+	}
+
+	rows, queryErr := postgres.db.Query(context.Background(), q.query, q.args)
+
+	if queryErr != nil {
+		return nil, fmt.Errorf("Error Querying Rows: %W", queryErr)
+	}
+
+	res, readErr := pgx.CollectRows(rows, pgx.RowToStructByName[internal.SearchResult])
+
+	if readErr != nil {
+		return nil, fmt.Errorf("Error converting query return to ids: %W", readErr)
+	}
+
+	return res, nil
+}
+
 func (q dbQuery) dbQueryReturningSingleAuthor() (dbAuthor, error) {
 	postgres, err := newPostgres(context.Background(), os.Getenv("DATABASE_URL"))
 	if err != nil {

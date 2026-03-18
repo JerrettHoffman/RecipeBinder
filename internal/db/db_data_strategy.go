@@ -3,6 +3,7 @@ package db
 import (
 	"RecipeBinder/internal"
 	"fmt"
+	"log"
 )
 
 type UserMismatchError struct {
@@ -10,7 +11,7 @@ type UserMismatchError struct {
 }
 
 func (e *UserMismatchError) Error() string {
-	return fmt.Sprintf("Error: ", e.Message)
+	return fmt.Sprintf("Error: %v", e.Message)
 }
 
 type DbRecipeDataStrategy struct{}
@@ -192,6 +193,16 @@ func (d DbUserAuthDataStrategy) UpdateAuthUser(currUserId internal.ID, newUser i
 
 type DBRecipeSearchStrategy struct{}
 
-// func (d DBRecipeSearchStrategy) Search(params internal.SearchParams) []internal.SearchResult {
-// 	return
-// }
+func (d DBRecipeSearchStrategy) Search(params internal.SearchParams) []internal.SearchResult {
+	// Version 1: search all inputs individually and then find recipeIDs in the intersection?
+	// Version The Real One: become a SQL God and do the crazy join, no LLMs allowed
+
+	results, err := searchQueryReturningMultipleIds(params)
+
+	if err != nil {
+		log.Printf("Search Error: %v", err)
+		return nil
+	}
+
+	return results
+}
