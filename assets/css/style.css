@@ -436,6 +436,11 @@ header {
 .logo {
 	font-size: 2rem;
 	padding-left: 2rem;
+
+	a {
+		color: var(--rp-text);
+		text-decoration: none;
+	}
 }
 
 .header-nav {
@@ -468,6 +473,7 @@ header {
 main {
 	max-width: 60rem;
 	margin: auto;
+	margin-bottom: 3rem;
 	padding-inline: 1rem;
 	font-variant-numeric: slashed-zero;
 }

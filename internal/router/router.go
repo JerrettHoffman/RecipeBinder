@@ -30,6 +30,7 @@ const (
 )
 
 var (
+	indexTpl  *template.Template
 	readTpl   *template.Template
 	editTpl   *template.Template
 	searchTpl *template.Template
@@ -89,7 +90,7 @@ func (router *Router) Setup() {
 
 	// Set up routing
 	fs := http.FileServer(http.Dir("assets"))
-	router.Mux.HandleFunc("/", router.searchGetRecipeHandler)
+	router.Mux.HandleFunc("/", router.indexHandler)
 	router.Mux.Handle("/assets/", http.StripPrefix("/assets/", fs))
 	router.Mux.HandleFunc("/read/{id}", router.readRecipeHandler)
 	router.Mux.HandleFunc("GET /create", router.createGetRecipeHandler)
@@ -110,6 +111,7 @@ func (router *Router) Setup() {
 		return filepath.Join(templateDirectory, relativePath)
 	}
 
+	indexTpl = template.Must(template.ParseFiles(makeAbsolute("base.tmpl"), makeAbsolute("header.tmpl"), makeAbsolute("index.tmpl")))
 	readTpl = template.Must(template.ParseFiles(makeAbsolute("base.tmpl"), makeAbsolute("header.tmpl"), makeAbsolute("read.tmpl")))
 	editTpl = template.Must(template.ParseFiles(makeAbsolute("base.tmpl"), makeAbsolute("header.tmpl"), makeAbsolute("edit.tmpl")))
 	searchTpl = template.Must(template.ParseFiles(makeAbsolute("base.tmpl"), makeAbsolute("header.tmpl"), makeAbsolute("search.tmpl")))
@@ -223,6 +225,17 @@ func formatDuration(duration int) string {
 		return fmt.Sprintf("%dm", durationMinutes)
 	} else {
 		return "0m"
+	}
+}
+
+func (router *Router) indexHandler(w http.ResponseWriter, r *http.Request) {
+	pageData := basePageData{
+		HasValidSession: hasValidSession(r),
+	}
+
+	if err := indexTpl.Execute(w, pageData); err != nil {
+		log.Printf("Failed to execute index%v\n", err)
+		http.Error(w, "server error", http.StatusInternalServerError)
 	}
 }
 
@@ -707,5 +720,5 @@ func (router *Router) loginPostRecipeHandler(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	http.Redirect(w, r, "/search", http.StatusSeeOther)
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
