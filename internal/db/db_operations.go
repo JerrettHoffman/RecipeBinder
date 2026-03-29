@@ -3,6 +3,7 @@ package db
 import (
 	"RecipeBinder/internal"
 	"fmt"
+	"log"
 	"strings"
 )
 
@@ -242,7 +243,19 @@ func constructSearchSQL(params internal.SearchParams) dbQuery {
 		whereClauses = append(whereClauses, `recipes.name >= @recipeName`)
 		args["recipeName"] = params.RecipeName
 	}
-	// TODO JERRETT: figure out text search in here too
+	// TODO CLOVE: You can pass me the search string itself and we can use google syntax automagically with websearch_to_tsqery() https://www.postgresql.org/docs/current/functions-textsearch.html#:~:text=websearch%5Fto%5Ftsquery,rat%27%20%7C%20%27cat%27%20%26%20%27dog
+	if len(params.Ingredients) > 0 {
+		var searchString strings.Builder
+		for index, value := range params.Ingredients {
+			if index > 0 {
+				searchString.WriteString(" | ")
+			}
+			searchString.WriteString(value)
+		}
+		whereClauses = append(whereClauses, `ingredient_vector @@ to_tsquery('english', @searchString)`)
+		args["searchString"] = searchString.String()
+
+	}
 
 	// put everything together
 	var queryString strings.Builder
@@ -277,7 +290,7 @@ func constructSearchSQL(params internal.SearchParams) dbQuery {
 
 func searchQueryReturningMultipleIds(params internal.SearchParams) ([]internal.SearchResult, error) {
 	q := constructSearchSQL(params)
-
+	log.Printf("Query string: %v", q.query)
 	dbRes, err := q.dbQueryMultipleRowsReturningIds()
 	if err != nil {
 		return nil, err
