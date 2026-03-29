@@ -248,11 +248,13 @@ func constructSearchSQL(params internal.SearchParams) dbQuery {
 		var searchString strings.Builder
 		for index, value := range params.Ingredients {
 			if index > 0 {
-				searchString.WriteString(" | ")
+				searchString.WriteString(" ")
 			}
+			searchString.WriteString(`"`)
 			searchString.WriteString(value)
+			searchString.WriteString(`"`)
 		}
-		whereClauses = append(whereClauses, `ingredient_vector @@ to_tsquery('english', @searchString)`)
+		whereClauses = append(whereClauses, `ingredient_vector @@ websearch_to_tsquery('english', @searchString)`)
 		args["searchString"] = searchString.String()
 
 	}
