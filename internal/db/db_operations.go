@@ -229,12 +229,12 @@ func constructSearchSQL(params internal.SearchParams) dbQuery {
 	// assemble where clauses and concatinate to where string
 	// TODO CLOVE: what will you pass if the user doesn't specify values to search by
 	if params.PrepTime > 0 {
-		whereClauses = append(whereClauses, `recipes.prep_time = @prepTime`)
+		whereClauses = append(whereClauses, `recipes.prep_time <= @prepTime`)
 		args["prepTime"] = params.PrepTime
 	}
 
 	if params.TotalTime > 0 {
-		whereClauses = append(whereClauses, `recipes.total_time = @totalTime`)
+		whereClauses = append(whereClauses, `recipes.total_time <= @totalTime`)
 		args["totalTime"] = params.TotalTime
 	}
 
