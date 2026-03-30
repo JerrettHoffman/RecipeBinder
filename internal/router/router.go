@@ -71,7 +71,15 @@ func retrieveUserData(ctx context.Context) (auth.UserData, error) {
 	if val := ctx.Value(userDataContext); val == nil {
 		return auth.UserData{Id: auth.UninitialzedId, User: ""}, errors.New("Failed to retrieve userData from context")
 	} else {
-		return val.(auth.UserData), nil
+		if userData, ok := val.(auth.UserData); ok {
+			if userData.Id == auth.UninitialzedId {
+				return userData, errors.New("Invalid user id")
+			} else {
+				return userData, nil
+			}
+		} else {
+			return auth.UserData{Id: auth.UninitialzedId, User: ""}, errors.New("UserData in context was not correct type")
+		}
 	}
 }
 
@@ -147,13 +155,8 @@ func parseID(r *http.Request) (internal.ID, error) {
 
 // Determines if there is a valid session in the request context
 func hasValidSession(r *http.Request) bool {
-	userData, err := retrieveUserData(r.Context())
-	if err != nil {
-		return false
-	} else if userData.Id == auth.UninitialzedId {
-		return false
-	}
-	return true
+	_, err := retrieveUserData(r.Context())
+	return err == nil
 }
 
 // Take in string of ingredient text and separate it into sections with headers
@@ -229,9 +232,7 @@ func formatDuration(duration int) string {
 }
 
 func (router *Router) indexHandler(w http.ResponseWriter, r *http.Request) {
-	pageData := basePageData{
-		HasValidSession: hasValidSession(r),
-	}
+	pageData := basePageData{HasValidSession: hasValidSession(r)}
 
 	if err := indexTpl.Execute(w, pageData); err != nil {
 		log.Printf("Failed to execute index%v\n", err)
@@ -277,11 +278,10 @@ func (router *Router) readRecipeHandler(w http.ResponseWriter, r *http.Request) 
 
 	stepsSections := formatStepSections(recipeData.Steps)
 
-	// TODO: Refactor this session logic
 	canEdit := false
 	sessionValid := false
 	userData, err := retrieveUserData(r.Context())
-	if err == nil && userData.Id != auth.UninitialzedId {
+	if err == nil {
 		// TODO: remove demo logic
 		canEdit = userData.User == recipeData.Uploader
 		sessionValid = true
@@ -330,14 +330,9 @@ func (router *Router) editGetRecipeHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	// TODO: Refactor this session logic
 	userData, err := retrieveUserData(r.Context())
 	if err != nil {
-		log.Printf("Failed to get userData %v", err)
-		http.Redirect(w, r, fmt.Sprintf("/read/%d", recipeId), http.StatusFound)
-		return
-	} else if userData.Id == auth.UninitialzedId {
-		log.Printf("Invalid user id")
+		log.Printf("GET /edit: %v", err)
 		http.Redirect(w, r, fmt.Sprintf("/read/%d", recipeId), http.StatusFound)
 		return
 	}
@@ -427,14 +422,9 @@ func (router *Router) editPostRecipeHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	// TODO: Refactor this session logic
 	userData, err := retrieveUserData(r.Context())
 	if err != nil {
-		log.Printf("Failed to get userData %v", err)
-		http.Redirect(w, r, fmt.Sprintf("/read/%d", recipeId), http.StatusFound)
-		return
-	} else if userData.Id == auth.UninitialzedId {
-		log.Printf("Invalid user id")
+		log.Printf("POST /edit: %v", err)
 		http.Redirect(w, r, fmt.Sprintf("/read/%d", recipeId), http.StatusFound)
 		return
 	}
@@ -577,6 +567,7 @@ func (router *Router) searchGetRecipeHandler(w http.ResponseWriter, r *http.Requ
 
 func (router *Router) addGetRecipeHandler(w http.ResponseWriter, r *http.Request) {
 	pageData := basePageData{hasValidSession(r)}
+
 	if err := addTpl.Execute(w, pageData); err != nil {
 		log.Printf("Failed to execute addGet %v\n", err)
 		http.Error(w, "server error", http.StatusInternalServerError)
@@ -585,28 +576,21 @@ func (router *Router) addGetRecipeHandler(w http.ResponseWriter, r *http.Request
 
 func (router *Router) createGetRecipeHandler(w http.ResponseWriter, r *http.Request) {
 	data := editTemplateData{
-		SubmitURL:   "/create",
-		RecipeName:  "",
-		Author:      "",
-		PrepTime:    formatDuration(60),
-		TotalTime:   formatDuration(60),
-		Yield:       "",
-		Ingredients: "",
-		Image:       "",
-		Steps:       "",
-		basePageData: basePageData{
-			hasValidSession(r),
-		},
+		SubmitURL:    "/create",
+		RecipeName:   "",
+		Author:       "",
+		PrepTime:     formatDuration(60),
+		TotalTime:    formatDuration(60),
+		Yield:        "",
+		Ingredients:  "",
+		Image:        "",
+		Steps:        "",
+		basePageData: basePageData{hasValidSession(r)},
 	}
 
-	// TODO: Refactor this session logic
-	userData, err := retrieveUserData(r.Context())
+	_, err := retrieveUserData(r.Context())
 	if err != nil {
-		log.Printf("Failed to get userData %v", err)
-		http.Redirect(w, r, "/login", http.StatusFound)
-		return
-	} else if userData.Id == auth.UninitialzedId {
-		log.Printf("Invalid user id")
+		log.Printf("GET /create: %v", err)
 		http.Redirect(w, r, "/login", http.StatusFound)
 		return
 	}
@@ -624,14 +608,9 @@ func (router *Router) createPostRecipeHandler(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	// TODO: Refactor this session logic
 	userData, err := retrieveUserData(r.Context())
 	if err != nil {
-		log.Printf("Failed to get userData %v", err)
-		http.Redirect(w, r, "/login", http.StatusFound)
-		return
-	} else if userData.Id == auth.UninitialzedId {
-		log.Printf("Invalid user id")
+		log.Printf("POST /create: %v", err)
 		http.Redirect(w, r, "/login", http.StatusFound)
 		return
 	}
@@ -667,6 +646,7 @@ func (router *Router) createPostRecipeHandler(w http.ResponseWriter, r *http.Req
 
 func (router *Router) signupGetRecipeHandler(w http.ResponseWriter, r *http.Request) {
 	pageData := basePageData{hasValidSession(r)}
+
 	if err := signupTpl.Execute(w, pageData); err != nil {
 		log.Printf("Failed to execute signupGet %v\n", err)
 		http.Error(w, "server error", http.StatusInternalServerError)
@@ -702,6 +682,7 @@ func (router *Router) loginGetRecipeHandler(w http.ResponseWriter, r *http.Reque
 	}
 
 	pageData := data{r.FormValue("error") == "true", r.FormValue("username"), basePageData{hasValidSession(r)}}
+
 	if err := loginTpl.Execute(w, pageData); err != nil {
 		log.Printf("Failed to execute loginGet %v\n", err)
 		http.Error(w, "server error", http.StatusInternalServerError)
