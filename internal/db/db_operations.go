@@ -211,9 +211,13 @@ func constructSearchSQL(params internal.SearchParams) dbQuery {
 	var joinClauses []string
 
 	if params.AuthorName != `` {
+		var aName strings.Builder
 		joinClauses = append(joinClauses, `INNER JOIN authors ON recipes.author_id=authors.id`)
-		whereClauses = append(whereClauses, `authors.name >= @authorName`)
-		args["authorName"] = params.AuthorName
+		whereClauses = append(whereClauses, `authors.name ILIKE @authorName`)
+		aName.WriteString(`%`)
+		aName.WriteString(params.AuthorName)
+		aName.WriteString(`%`)
+		args["authorName"] = aName.String()
 	}
 
 	if params.UploaderName != `` {
@@ -240,8 +244,12 @@ func constructSearchSQL(params internal.SearchParams) dbQuery {
 	}
 
 	if params.RecipeName != `` {
-		whereClauses = append(whereClauses, `recipes.name >= @recipeName`)
-		args["recipeName"] = params.RecipeName
+		var rName strings.Builder
+		whereClauses = append(whereClauses, `recipes.name ILIKE @recipeName`)
+		rName.WriteString(`%`)
+		rName.WriteString(params.RecipeName)
+		rName.WriteString(`%`)
+		args["recipeName"] = rName.String()
 	}
 	// TODO CLOVE: You can pass me the search string itself and we can use google syntax automagically with websearch_to_tsqery() https://www.postgresql.org/docs/current/functions-textsearch.html#:~:text=websearch%5Fto%5Ftsquery,rat%27%20%7C%20%27cat%27%20%26%20%27dog
 	if len(params.Ingredients) > 0 {
@@ -293,10 +301,13 @@ func constructSearchSQL(params internal.SearchParams) dbQuery {
 func searchQueryReturningMultipleIds(params internal.SearchParams) ([]internal.SearchResult, error) {
 	q := constructSearchSQL(params)
 	log.Printf("Query string: %v", q.query)
+	log.Printf("Query arguments: %+v", q.args)
 	dbRes, err := q.dbQueryMultipleRowsReturningIds()
 	if err != nil {
 		return nil, err
 	}
+
+	log.Printf("Query Result: %+v", dbRes)
 
 	return dbRes, nil
 
