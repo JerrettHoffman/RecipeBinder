@@ -1,0 +1,30 @@
+services:
+  db:
+    image: postgres:18-alpine
+    restart: unless-stopped
+    # set shared memory limit when using docker compose
+    shm_size: 128mb
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/recipe_binder_db_password
+    ports:
+      - "5432:5432"
+    # TODO: Setup volumes for persistent storage
+    secrets:
+      - recipe_binder_db_password
+
+  recipe-binder:
+    build: .
+    restart: "no"
+    depends_on:
+      - db
+    # The server in the container is configured to use port 80
+    # Change the left number to whatever port you'd like your host system to listen on
+    ports:
+      - "8080:80"
+    # This is the internal networking 'database' can be used as the host name in the postgres url environment variable
+    links:
+      - "db:database"
+
+secrets:
+     recipe_binder_db_password:
+            file: secrets/db_password.txt

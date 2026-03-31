@@ -42,7 +42,7 @@ func main() {
 
 		// Initialize the server
 		goServer := &http.Server{
-			Addr:                         ":8080",
+			Addr:                         ":80",
 			Handler:                      auth.SessionMiddleware(r.Handler),
 			DisableGeneralOptionsHandler: false,
 			ReadTimeout:                  10 * time.Second,
@@ -68,7 +68,8 @@ func main() {
 			close(idleConnsClosed)
 		}()
 
-		log.Print("Starting server...\n\n\nhttp://localhost:8080/search\n\n")
+		// TODO: log with mapped port from container?
+		log.Print("Starting server...\n\n\nhttp://localhost:80/search\n\n")
 
 		// Kickoff server
 		if err := goServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {

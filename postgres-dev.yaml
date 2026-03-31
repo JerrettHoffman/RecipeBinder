@@ -1,0 +1,17 @@
+services:
+
+  db:
+    image: postgres:alpine
+    restart: "no"
+    # set shared memory limit when using docker compose
+    shm_size: 128mb
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/dev_recipe_binder_db_password
+    ports:
+      5432:5432
+    secrets:
+      - dev_recipe_binder_db_password
+
+secrets:
+     dev_recipe_binder_db_password:
+            file: secrets/dev_db_password.txt
